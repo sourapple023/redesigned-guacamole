@@ -588,134 +588,9 @@
             font-weight: 500;
         }
 
-        /* --- API Key Modal --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85); /* Darker overlay */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        .modal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-        .api-key-modal-content {
-            background-color: var(--modal-bg-color);
-            border: 1px solid var(--modal-border-color);
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 450px;
-            width: 90%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.08); /* Stronger modal shadow */
-            text-align: center;
-            transform: scale(0.9) translateY(-30px); /* More pronounced initial state for animation */
-            opacity: 0;
-            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
-        }
-        .modal-overlay.visible .api-key-modal-content {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-        }
-        .api-key-modal-content h2 {
-            color: var(--primary-glow);
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-weight: 600;
-            font-size: 1.6em;
-            transition: color 0.5s ease;
-        }
-        .api-key-modal-content p {
-            font-size: 0.95em;
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
-        .api-key-modal-input {
-            width: calc(100% - 24px); /* Account for padding */
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid var(--response-border);
-            border-radius: 8px;
-            background-color: var(--code-bg);
-            color: var(--text-light);
-            font-size: 1em;
-            outline: none;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease, background-color 0.5s ease, color 0.5s ease, box-shadow 0.3s ease;
-        }
-        .api-key-modal-input:focus {
-            border-color: var(--primary-glow);
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); /* Stronger focus glow */
-        }
-        body.light-theme .api-key-modal-input:focus {
-            box-shadow: 0 0 10px rgba(0, 123, 255, 0.4);
-        }
-
-        .modal-button-group {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        .modal-button {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
-        }
-        .modal-button.primary {
-            background-color: var(--primary-glow);
-            color: var(--bg-dark); /* Dark text on glow button */
-            box-shadow: 0 0 12px rgba(0, 255, 255, 0.6); /* Stronger glow */
-        }
-        body.light-theme .modal-button.primary {
-            background-color: var(--primary-glow);
-            color: white;
-            box-shadow: 0 0 12px rgba(0, 123, 255, 0.4);
-        }
-        .modal-button.primary:hover {
-            background-color: var(--primary-glow-darker);
-            transform: translateY(-3px); /* Lift more on hover */
-            box-shadow: 0 6px 20px rgba(0, 255, 255, 0.8); /* Even stronger hover glow */
-        }
-        body.light-theme .modal-button.primary:hover {
-            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.6);
-        }
-        .modal-button.secondary {
-            background-color: transparent;
-            color: var(--text-medium);
-            border: 1px solid var(--text-medium);
-        }
-        .modal-button.secondary:hover {
-            color: var(--text-light);
-            border-color: var(--text-light);
-            transform: translateY(-2px);
-        }
-
-        /* --- API Key Management Link --- */
+        /* --- API Key Management Link - HIDDEN/REMOVED --- */
         #apiKeyLink {
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: var(--link-color);
-            text-decoration: none;
-            opacity: 0.8;
-            transition: color 0.3s ease, opacity 0.3s ease, transform 0.2s ease;
-        }
-        #apiKeyLink:hover {
-            opacity: 1;
-            color: var(--primary-glow-darker);
-            text-decoration: underline;
-            transform: translateY(-1px);
+            display: none; /* Hide the API Key link */
         }
 
         /* --- Theme Toggle Button --- */
@@ -783,13 +658,6 @@
             #responseArea ul, #responseArea ol {
                 padding-left: 20px;
             }
-            .api-key-modal-content {
-                padding: 20px;
-            }
-            .modal-button {
-                padding: 10px 20px;
-                font-size: 0.9em;
-            }
             #themeToggle {
                 font-size: 1.8em;
                 top: 15px;
@@ -801,8 +669,7 @@
 </head>
 <body>
 
-    <!-- Google Generative AI JavaScript SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.1/dist/index.min.js"></script>
+    <!-- Google Generative AI JavaScript SDK - REMOVED, now handled by backend -->
 
     <button id="themeToggle" aria-label="Toggle theme">
         <!-- Material Symbols Icons for theme toggle -->
@@ -826,20 +693,9 @@
         <!-- Initial content will be dynamically typed out by JS -->
     </div>
 
-    <a href="#" id="apiKeyLink">Manage API Key</a>
+    <!-- API Key Management Link - REMOVED -->
 
-    <!-- API Key Modal -->
-    <div id="apiKeyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="apiKeyModalTitle">
-        <div class="api-key-modal-content">
-            <h2 id="apiKeyModalTitle">Enter Your Gemini API Key</h2>
-            <p>To interact with Gemini AI, please provide your API key. You can generate one from <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--link-color);">Google AI Studio</a>.</p>
-            <input type="text" id="apiKeyInput" class="api-key-modal-input" placeholder="Paste your API key here..." autocomplete="off">
-            <div class="modal-button-group">
-                <button id="saveApiKeyButton" class="modal-button primary">Save Key</button>
-                <button id="cancelApiKeyButton" class="modal-button secondary">Cancel</button>
-            </div>
-        </div>
-    </div>
+    <!-- API Key Modal - REMOVED -->
 
     <script>
         // --- DOM Elements ---
@@ -848,33 +704,24 @@
         const clearInputButton = document.getElementById('clearInputButton');
         const voiceSearchButton = document.getElementById('voiceSearchButton');
         const responseArea = document.getElementById('responseArea');
-        const apiKeyLink = document.getElementById('apiKeyLink');
         const themeToggle = document.getElementById('themeToggle');
         const iconDark = themeToggle.querySelector('.icon-dark');
         const iconLight = themeToggle.querySelector('.icon-light');
         const suggestionsList = document.getElementById('suggestions');
-        const searchContainer = document.querySelector('.search-container'); // Added for click outside suggestions
-
-        const apiKeyModal = document.getElementById('apiKeyModal');
-        const apiKeyInput = document.getElementById('apiKeyInput');
-        const saveApiKeyButton = document.getElementById('saveApiKeyButton');
-        const cancelApiKeyButton = document.getElementById('cancelApiKeyButton');
+        const searchContainer = document.querySelector('.search-container');
 
         // --- Constants ---
-        const API_KEY_STORAGE_KEY = 'geminiApiKey';
+        const BACKEND_URL = 'http://localhost:3000'; // Your backend server URL
         const THEME_STORAGE_KEY = 'userTheme';
         const TYPING_SPEED = 20; // Milliseconds per character
         const DEBOUNCE_DELAY = 300; // Milliseconds for autosuggest debounce
 
         // --- Global State ---
-        let geminiApiKey = localStorage.getItem(API_KEY_STORAGE_KEY);
-        let genAI;
-        let model;
-        let chatSession; // For conversational context
         let currentSuggestions = [];
         let suggestionIndex = -1;
         let isGenerating = false; // Flag to prevent multiple requests
         let speechRecognition; // Web Speech API
+        let chatHistory = []; // Stores conversation history for context
 
         // --- Theme Toggle Logic ---
         function applyTheme(theme) {
@@ -888,92 +735,6 @@
             const currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             applyTheme(newTheme);
-        }
-
-        // --- API Key Modal Logic ---
-        function showApiKeyModal() {
-            apiKeyModal.classList.add('visible');
-            apiKeyInput.value = geminiApiKey || ''; // Pre-fill if exists
-            apiKeyInput.focus();
-        }
-
-        function hideApiKeyModal() {
-            apiKeyModal.classList.remove('visible');
-            searchInput.focus(); // Return focus to search input after closing modal
-        }
-
-        function handleApiKeyInput() {
-            const key = apiKeyInput.value.trim();
-            if (key) {
-                localStorage.setItem(API_KEY_STORAGE_KEY, key);
-                geminiApiKey = key;
-                hideApiKeyModal();
-                initializeGemini(); // Attempt to re-initialize Gemini with the new key
-            } else {
-                alert("API Key cannot be empty!");
-            }
-        }
-
-        // --- Gemini AI Initialization ---
-        async function initializeGemini() {
-            if (geminiApiKey) {
-                try {
-                    // Check if SDK is already loaded or load it
-                    if (typeof window.GoogleGenerativeAI === 'undefined') {
-                        console.log("Loading Gemini AI SDK script dynamically...");
-                        await new Promise((resolve, reject) => {
-                            const script = document.createElement('script');
-                            script.src = "https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.1/dist/index.min.js";
-                            script.onload = () => {
-                                if (typeof window.GoogleGenerativeAI !== 'undefined') {
-                                    resolve();
-                                } else {
-                                    reject(new Error("Google Generative AI SDK did not become available after loading."));
-                                }
-                            };
-                            script.onerror = () => reject(new Error("Google Generative AI SDK script failed to load. Check internet connection."));
-                            document.head.appendChild(script);
-                        });
-                    }
-
-                    genAI = new window.GoogleGenerativeAI(geminiApiKey);
-                    // --- START OF REQUIRED CHANGE FOR GEMINI 2.5 FLASH ---
-                    // Please verify the exact model ID for Gemini 1.5 Flash in Google AI Studio
-                    // Common IDs: "gemini-pro", "gemini-1.5-flash", "gemini-1.5-pro"
-                    model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Changed from "gemini-pro"
-                    // --- END OF REQUIRED CHANGE FOR GEMINI 2.5 FLASH ---
-
-                    chatSession = model.startChat({ history: [] }); // Initialize chat session for conversation
-                    console.log("Gemini AI model (gemini-1.5-flash) and chat session initialized successfully.");
-                    sendButton.disabled = false;
-                    searchInput.disabled = false;
-                    searchInput.placeholder = "Ask Gemini something...";
-                    searchInput.focus();
-                } catch (error) {
-                    console.error("Failed to initialize Gemini AI:", error);
-                    let errorMessage = `Failed to initialize Gemini AI: ${error.message}.`;
-                    if (error.message.includes('SDK not loaded') || error.message.includes('did not become available')) {
-                        errorMessage += " Please check your internet connection or browser extensions (e.g., ad-blockers) that might block external scripts.";
-                    } else if (error.message.includes('API_KEY_INVALID') || error.message.includes('401')) { // 401 is common for invalid key
-                        errorMessage = "Your API key seems invalid or unauthorized. Please click 'Manage API Key' to re-enter it.";
-                        localStorage.removeItem(API_KEY_STORAGE_KEY);
-                        geminiApiKey = null;
-                        showApiKeyModal(); // Show modal if key is invalid
-                    } else if (error.message.includes('500') || error.message.includes('internal error')) {
-                         errorMessage = "An internal server error occurred with Gemini. Please try again later.";
-                    }
-                    displayResponse(`<p class="error-message">${errorMessage}</p>`, false); // Don't animate error
-                    sendButton.disabled = true;
-                    searchInput.disabled = true;
-                    searchInput.placeholder = "Initialization failed.";
-                    if (!geminiApiKey) showApiKeyModal(); // If still no key, show modal
-                }
-            } else {
-                showApiKeyModal(); // Show modal if key is not found on load
-                sendButton.disabled = true;
-                searchInput.disabled = true;
-                searchInput.placeholder = "API Key required...";
-            }
         }
 
         // --- Markdown to HTML Conversion ---
@@ -1023,7 +784,7 @@
                         processedLines.push(`<${currentListType}>`);
                         listStack.push({ type: currentListType, indent: currentIndent });
                     }
-                    
+
                     processedLines.push(`<li>${listItemContent}</li>`);
                 } else {
                     // Close all open lists if a non-list item is encountered
@@ -1081,8 +842,8 @@
 
         // --- Response Display & Typing Animation ---
         async function displayResponse(fullHtmlContent, animate = true) {
-            responseArea.classList.add('visible'); // Ensure response area is visible
-            
+            responseArea.classList.add('visible');
+
             if (!animate) {
                 responseArea.innerHTML = fullHtmlContent;
                 addCopyCodeButtons();
@@ -1107,7 +868,7 @@
             // Remove typing cursor after full content is displayed
             responseArea.innerHTML = fullHtmlContent;
             addCopyCodeButtons(); // Add copy buttons after the text is fully rendered
-            
+
             // Add fade-in class to individual elements *after* typing is complete
             // This allows them to animate into place if they are block elements
             Array.from(responseArea.querySelectorAll('p, ul, ol, h1, h2, h3, blockquote, .code-block')).forEach((child, index) => {
@@ -1172,53 +933,47 @@
             });
         }
 
-        // --- Send Message to Gemini ---
+        // --- Send Message to Gemini (via backend) ---
         async function sendMessage() {
             const promptText = searchInput.value.trim();
             if (!promptText || isGenerating) return;
-
-            if (!geminiApiKey) {
-                displayResponse('<p class="error-message">No Gemini API Key found. Please click "Manage API Key" below to enter it.</p>', false);
-                showApiKeyModal();
-                return;
-            }
-            if (!chatSession) {
-                displayResponse('<p class="error-message">Gemini chat session not initialized. Please refresh the page or re-enter your API key.</p>', false);
-                initializeGemini(); // Try to re-initialize
-                return;
-            }
 
             searchInput.value = ''; // Clear input
             clearInputButton.classList.remove('visible'); // Hide clear button
             hideSuggestions();
             setLoadingState(true);
 
+            // Add user's message to chat history for context
+            chatHistory.push({ role: "user", parts: [{ text: promptText }] });
+
             try {
-                // Add user's message to chat history implicitly by calling send
-                const result = await chatSession.sendMessage(promptText);
-                const response = await result.response;
-                const text = response.text();
-                await displayResponse(formatMarkdown(text));
-            } catch (error) {
-                console.error("Error calling Gemini AI:", error);
-                let errorMessage = `Error: ${error.message}.`;
-                if (error.message.includes('API key not valid') || error.message.includes('API_KEY_INVALID') || error.message.includes('401')) {
-                    errorMessage = "Your API key seems invalid or unauthorized. Please click 'Manage API Key' to re-enter it.";
-                    localStorage.removeItem(API_KEY_STORAGE_KEY);
-                    geminiApiKey = null;
-                    showApiKeyModal();
-                } else if (error.message.includes('Quota exceeded') || error.message.includes('429')) {
-                    errorMessage = "You might have exceeded your Gemini API quota. Please check your Google Cloud Console.";
-                } else if (error.message.includes('undefined is not a constructor') || error.message.includes('SDK not loaded')) {
-                    errorMessage = "Gemini SDK failed to load. Check internet, ad-blockers, or browser console (F12).";
-                } else if (error.message.includes('500') || error.message.includes('internal error')) {
-                    errorMessage = "An internal server error occurred with Gemini. Please try again later.";
-                } else if (error.message.includes('400') || error.message.includes('bad request')) {
-                    errorMessage = "The request to Gemini was malformed. This might be due to content policy violations or an issue with the prompt.";
-                } else if (error.message.includes('blocked content')) {
-                    errorMessage = "The response was blocked due to content safety concerns. Please try rephrasing your query.";
+                const response = await fetch(`${BACKEND_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: promptText, history: chatHistory }), // Send prompt and full history
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! Status: ${response.status}`);
                 }
-                displayResponse(`<p class="error-message">${errorMessage}</p>`, false); // Don't animate errors
+
+                const data = await response.json();
+                const aiResponseText = data.response;
+
+                // Add Gemini's response to chat history
+                chatHistory.push({ role: "model", parts: [{ text: aiResponseText }] });
+
+                await displayResponse(formatMarkdown(aiResponseText));
+            } catch (error) {
+                console.error("Error communicating with backend/Gemini AI:", error);
+                displayResponse(`<p class="error-message">Error: ${error.message}. Please ensure your backend server is running and configured correctly.</p>`, false); // Don't animate errors
+                // If there was an error, the last user message should ideally not be added to history,
+                // or marked as failed, but for simplicity here, we'll just log and display error.
+                // You might want to remove the last chatHistory entry if it was a user message that failed.
+                chatHistory.pop(); // Remove the user message that caused the error for a cleaner history
             } finally {
                 setLoadingState(false);
             }
@@ -1246,7 +1001,9 @@
             "Recommend some science fiction books.",
             "Translate 'Hello, how are you?' into Spanish.",
             "Write a short, inspiring quote.",
-            "What is the current time in New York?"
+            "What is the current time in New York?", // Good for testing the tool!
+            "What is the date and time right now?", // Good for testing the tool!
+            "What time is it in London?" // Good for testing the tool!
         ];
 
         function showSuggestions() {
@@ -1372,19 +1129,18 @@
 
         // --- Voice Search Logic ---
         function initializeVoiceSearch() {
-            // Check for webkitSpeechRecognition for broader browser support for now
             if ('webkitSpeechRecognition' in window) {
                 speechRecognition = new webkitSpeechRecognition();
-                speechRecognition.continuous = false; // Listen for a single utterance
-                speechRecognition.interimResults = false; // Only return final results
-                speechRecognition.lang = 'en-US'; // Set language
+                speechRecognition.continuous = false;
+                speechRecognition.interimResults = false;
+                speechRecognition.lang = 'en-US';
 
                 speechRecognition.onstart = () => {
                     voiceSearchButton.classList.add('listening');
                     searchInput.placeholder = "Listening...";
                     searchInput.value = "";
                     searchInput.focus();
-                    searchInput.setAttribute('aria-live', 'assertive'); // Announce listening state
+                    searchInput.setAttribute('aria-live', 'assertive');
                 };
 
                 speechRecognition.onresult = (event) => {
@@ -1392,7 +1148,7 @@
                     searchInput.value = transcript;
                     voiceSearchButton.classList.remove('listening');
                     searchInput.removeAttribute('aria-live');
-                    sendMessage(); // Send message automatically after voice input
+                    sendMessage();
                 };
 
                 speechRecognition.onerror = (event) => {
@@ -1407,7 +1163,6 @@
                     } else if (event.error === 'network') {
                         searchInput.placeholder = "Network error with voice recognition. Try again?";
                     }
-                     // Restore placeholder after a short delay
                     setTimeout(() => {
                         if (!isGenerating) {
                             searchInput.placeholder = "Ask Gemini something...";
@@ -1418,7 +1173,7 @@
                 speechRecognition.onend = () => {
                     voiceSearchButton.classList.remove('listening');
                     searchInput.removeAttribute('aria-live');
-                    if (!isGenerating && searchInput.value === "") { // Only reset placeholder if not generating and no text
+                    if (!isGenerating && searchInput.value === "") {
                         searchInput.placeholder = "Ask Gemini something...";
                     }
                 };
@@ -1432,7 +1187,7 @@
                     }
                 });
             } else {
-                voiceSearchButton.style.display = 'none'; // Hide button if not supported
+                voiceSearchButton.style.display = 'none';
                 console.warn("Web Speech API (webkitSpeechRecognition) not supported in this browser.");
             }
         }
@@ -1455,18 +1210,6 @@
             searchInput.focus();
             hideSuggestions();
         });
-        apiKeyLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            showApiKeyModal();
-        });
-        saveApiKeyButton.addEventListener('click', handleApiKeyInput);
-        cancelApiKeyButton.addEventListener('click', hideApiKeyModal);
-        // Close modal if overlay is clicked
-        apiKeyModal.addEventListener('click', (e) => {
-            if (e.target === apiKeyModal) {
-                hideApiKeyModal();
-            }
-        });
         themeToggle.addEventListener('click', toggleTheme);
 
 
@@ -1479,32 +1222,35 @@
             // Initialize Voice Search
             initializeVoiceSearch();
 
-            // Initial AI welcome message (the "real thing")
             const initialWelcomeMarkdown = `
 Hello there! I'm Gemini, ready to assist you using the **Flash 1.5 model**.
+
+I'm powered by a robust backend that keeps our conversation context and allows me to perform **complex tasks** like:
+*   Answering general questions.
+*   Generating creative content.
+*   **Using tools** (like getting the current date and time for any location!)
 
 **Here's how you can interact with me:**
 *   Type your questions in the search bar above.
 *   Use the <span class="material-symbols-outlined inline-icon">mic</span> button for voice input.
 *   Press Enter or the <span class="material-symbols-outlined inline-icon">play_arrow</span> button to send your query.
 
-Your API Key (required for me to work!) will be securely stored in your browser's local storage. You can manage it using the "Manage API Key" link below.
-
 Feel free to ask me anything — I remember our conversation context!
             `;
 
-            // Give a tiny delay before initializing Gemini to ensure UI renders
-            setTimeout(async () => {
-                await initializeGemini();
-                // Display the welcome message as if Gemini typed it
-                displayResponse(formatMarkdown(initialWelcomeMarkdown), true);
-            }, 100);
-
+            // Display the welcome message as if Gemini typed it
+            displayResponse(formatMarkdown(initialWelcomeMarkdown), true);
 
             // Update clear button visibility on load if input already has text (e.g., browser autofill)
             if (searchInput.value.length > 0) {
                 clearInputButton.classList.add('visible');
             }
+
+            // Initially enable send button as backend presence is assumed at runtime
+            sendButton.disabled = false;
+            searchInput.disabled = false;
+            searchInput.placeholder = "Ask Gemini something...";
+            searchInput.focus();
         });
     </script>
 </body>
