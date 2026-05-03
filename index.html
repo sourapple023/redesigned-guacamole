@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gemini Glow Search Pro (Upgraded)</title>
     <!-- Google Fonts - Poppins for a clean, modern look -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Material Symbols Outlined for icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
@@ -19,7 +19,7 @@
             --text-light: #e0e0e0;
             --text-medium: #888;
             --input-bg: #1a1a1a;
-            --response-bg: rgba(26, 26, 26, 0.8); /* Semi-transparent */
+            --response-bg: rgba(26, 26, 26, 0.85); /* Slightly less transparent */
             --response-border: #333;
             --code-bg: #2a2a2a;
             --code-border: #444;
@@ -34,6 +34,8 @@
             --placeholder-color: var(--text-medium);
             --subtle-shadow-dark: 0 0 5px rgba(0, 255, 255, 0.1);
             --subtle-shadow-light: 0 0 5px rgba(0, 123, 255, 0.1);
+            --header-text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            --item-fade-transition: all 0.5s ease-out;
         }
 
         /* Light Theme overrides */
@@ -46,7 +48,7 @@
             --text-light: #333;
             --text-medium: #666;
             --input-bg: #ffffff;
-            --response-bg: rgba(255, 255, 255, 0.9);
+            --response-bg: rgba(255, 255, 255, 0.95); /* Slightly less transparent */
             --response-border: #ccc;
             --code-bg: #e8e8f0;
             --code-border: #d0d0d5;
@@ -59,6 +61,7 @@
             --suggestion-hover-bg: #e0e0e5;
             --typing-cursor: var(--primary-glow-darker);
             --placeholder-color: #999;
+            --header-text-shadow: none; /* No text shadow for header in light theme */
         }
 
         /* Basic Reset & Body Styling */
@@ -68,7 +71,7 @@
             font-family: 'Poppins', sans-serif; /* Use Poppins */
             background: radial-gradient(circle at center, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             /* Adjusted background image opacity for a softer texture */
-            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M0 0h3v3H0V0zm3 3h3v3H3V3z'/%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.03' fill-rule='evenodd'%3E%3Cpath d='M0 0h3v3H0V0zm3 3h3v3H3V3z'/%3E%3C/g%3E%3C/svg%3E");
             color: var(--text-light);
             display: flex;
             flex-direction: column;
@@ -80,6 +83,20 @@
             text-rendering: optimizeLegibility; /* Improve font rendering */
             -webkit-font-smoothing: antialiased; /* Smoother fonts on Webkit */
             -moz-osx-font-smoothing: grayscale; /* Smoother fonts on Firefox */
+        }
+
+        /* App Title */
+        .app-title {
+            font-size: clamp(2em, 5vw, 3.5em); /* Responsive font size */
+            color: var(--primary-glow);
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-shadow: var(--header-text-shadow);
+            transition: color 0.5s ease, text-shadow 0.5s ease;
+            letter-spacing: 1px;
+            pointer-events: none; /* Don't interfere with clicks */
+            user-select: none;
+            text-align: center;
         }
 
         /* Container for the search bar and button */
@@ -147,6 +164,7 @@
         #searchInput.suggestions-visible {
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
+            border-color: var(--response-border); /* Match suggestion border */
         }
 
         /* Input pulse animation - Dark Theme */
@@ -185,7 +203,7 @@
         }
 
         body.light-theme .input-buttons button {
-            filter: drop_shadow(0 0 1px rgba(0, 123, 255, 0.2));
+            filter: drop-shadow(0 0 1px rgba(0, 123, 255, 0.2));
         }
 
         .input-buttons button:hover:not(:disabled) {
@@ -316,10 +334,20 @@
             transform: translateY(0);
         }
 
+        /* Styles for content inside responseArea */
         #responseArea p, #responseArea ul, #responseArea ol, #responseArea h1, #responseArea h2, #responseArea h3, #responseArea div.code-block, #responseArea blockquote {
             margin: 0 0 1em 0;
             padding: 0;
+            /* Animation for content items */
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--item-fade-transition);
         }
+        #responseArea p.fade-in, #responseArea ul.fade-in, #responseArea ol.fade-in, #responseArea h1.fade-in, #responseArea h2.fade-in, #responseArea h3.fade-in, #responseArea div.code-block.fade-in, #responseArea blockquote.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         #responseArea p:last-child, #responseArea li:last-child {
              margin-bottom: 0;
         }
@@ -557,7 +585,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8); /* Slightly darker overlay */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -577,14 +605,14 @@
             padding: 30px;
             max-width: 450px;
             width: 90%;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.05); /* Stronger modal shadow */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.08); /* Stronger modal shadow */
             text-align: center;
-            transform: translateY(-20px);
+            transform: scale(0.95) translateY(-20px); /* Initial scale and translate for animation */
             opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
         }
         .modal-overlay.visible .api-key-modal-content {
-            transform: translateY(0);
+            transform: scale(1) translateY(0);
             opacity: 1;
         }
         .api-key-modal-content h2 {
@@ -705,6 +733,9 @@
 
         /* Media Queries for better responsiveness */
         @media (max-width: 480px) {
+            .app-title {
+                margin-bottom: 30px;
+            }
             #searchInput {
                 padding: 14px 18px;
                 padding-right: 110px;
@@ -755,7 +786,6 @@
 <body>
 
     <!-- Google Generative AI JavaScript SDK -->
-    <!-- The SDK is now dynamically loaded in JS if not found, making this tag somewhat redundant but harmless -->
     <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.1/dist/index.min.js"></script>
 
     <button id="themeToggle" aria-label="Toggle theme">
@@ -763,6 +793,8 @@
         <span class="material-symbols-outlined icon-dark">dark_mode</span>
         <span class="material-symbols-outlined icon-light" style="display: none;">light_mode</span>
     </button>
+
+    <h1 class="app-title">Gemini Glow Search Pro</h1>
 
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="Ask Gemini something..." aria-label="Search or ask Gemini" autofocus autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" aria-expanded="false">
@@ -775,9 +807,7 @@
     </div>
 
     <div id="responseArea" role="region" aria-live="polite" aria-atomic="false">
-        <p>Your journey with Gemini AI begins here. Type a question above and press Enter or the <span class="material-symbols-outlined" style="font-size: 0.9em; vertical-align: middle; color: var(--primary-glow);">play_arrow</span> button.</p>
-        <p>Your API Key will be securely stored in your browser's local storage for convenience.</p>
-        <p>You can ask follow-up questions, as Gemini now remembers the conversation context!</p>
+        <!-- Initial content will be dynamically typed out by JS -->
     </div>
 
     <a href="#" id="apiKeyLink">Manage API Key</a>
@@ -891,9 +921,14 @@
                     }
 
                     genAI = new window.GoogleGenerativeAI(geminiApiKey);
-                    model = genAI.getGenerativeModel({ model: "gemini-pro" });
+                    // --- START OF REQUIRED CHANGE FOR GEMINI 2.5 FLASH ---
+                    // Please verify the exact model ID for Gemini 2.5 Flash in Google AI Studio
+                    // Common IDs: "gemini-pro", "gemini-1.5-flash", "gemini-1.5-pro"
+                    model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Changed from "gemini-pro"
+                    // --- END OF REQUIRED CHANGE FOR GEMINI 2.5 FLASH ---
+
                     chatSession = model.startChat({ history: [] }); // Initialize chat session for conversation
-                    console.log("Gemini AI model and chat session initialized successfully.");
+                    console.log("Gemini AI model (gemini-1.5-flash) and chat session initialized successfully.");
                     sendButton.disabled = false;
                     searchInput.disabled = false;
                     searchInput.placeholder = "Ask Gemini something...";
@@ -937,7 +972,7 @@
             // Handle code blocks (must be first, and handle multiline code safely)
             html = html.replace(/```(\w*)\n([\s\S]*?)```/gm, (match, lang, code) => {
                 const languageClass = lang ? `language-${lang.toLowerCase()}` : '';
-                return `<div class="code-block"><button class="copy-code-button">Copy</button><pre><code class="${languageClass}">${escapeHtml(code.trim())}</code></pre></div>`;
+                return `<div class="code-block"><button class="copy-code-button" aria-label="Copy code to clipboard">Copy</button><pre><code class="${languageClass}">${escapeHtml(code.trim())}</code></pre></div>`;
             });
 
             // Blockquotes
@@ -952,11 +987,9 @@
             const lines = html.split('\n');
             let processedLines = [];
             let inList = false;
-            let listType = ''; // 'ul' or 'ol'
-            let indentLevel = 0; // For simple nested lists
+            let listStack = []; // To handle nested lists more robustly
 
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i];
+            lines.forEach(line => {
                 const ulMatch = line.match(/^(\s*)[*-] (.*)/);
                 const olMatch = line.match(/^(\s*)(\d+)\. (.*)/);
 
@@ -965,68 +998,23 @@
                     const currentListType = ulMatch ? 'ul' : 'ol';
                     const listItemContent = ulMatch ? ulMatch[2].trim() : olMatch[3].trim();
 
-                    if (!inList) {
-                        // Start new list
-                        processedLines.push(`<${currentListType}>`);
-                        inList = true;
-                        listType = currentListType;
-                        indentLevel = currentIndent;
-                    } else if (currentListType !== listType || currentIndent > indentLevel) {
-                        // Handle (simple) nesting or type change
-                        if (currentIndent > indentLevel) { // Nested list
-                            processedLines.push(`<${currentListType}>`);
-                            indentLevel = currentIndent;
-                            listType = currentListType; // Update type for inner list
-                        } else if (currentListType !== listType) { // List type changed at same level
-                            processedLines.push(`</${listType}><${currentListType}>`);
-                            listType = currentListType;
-                            indentLevel = currentIndent;
-                        } else if (currentIndent < indentLevel) { // De-nesting
-                             while (currentIndent < indentLevel && processedLines.length > 0) {
-                                let lastTag = processedLines[processedLines.length - 1];
-                                if (lastTag.startsWith('</ul') || lastTag.startsWith('</ol')) {
-                                    processedLines.pop(); // Remove closing tag
-                                }
-                                processedLines.push(`</${listType}>`);
-                                indentLevel -= 2; // Assuming 2 spaces per indent
-                             }
-                             // Now ensure current list type matches again
-                             if (currentListType !== listType) {
-                                processedLines.push(`</${listType}><${currentListType}>`);
-                                listType = currentListType;
-                             }
-                             indentLevel = currentIndent; // Update indent after de-nesting
-                        }
-                    } else if (currentIndent < indentLevel) {
-                         // This is a more complex de-nesting case; for simplicity, we'll close and reopen.
-                         // A more robust parser would track a stack of lists.
-                         while (indentLevel > currentIndent) {
-                            processedLines.push(`</${listType}>`);
-                            indentLevel -= 2; // Assume 2 spaces per indent
-                         }
-                         if (currentListType !== listType) {
-                            processedLines.push(`</${listType}><${currentListType}>`);
-                            listType = currentListType;
-                         }
-                    }
-                    processedLines.push(`<li>${listItemContent}</li>`);
-                } else {
-                    if (inList) {
-                        // Close any open lists
-                        while (indentLevel >= 0 && processedLines.length > 0) {
-                            let lastTag = processedLines[processedLines.length - 1];
-                            if (lastTag.startsWith('</ul') || lastTag.startsWith('</ol')) {
-                                processedLines.pop(); // Remove redundant closing tags
-                            }
-                            processedLines.push(`</${listType}>`);
-                            indentLevel -= 2; // Adjust for next potential list
-                            if (indentLevel < 0) break; // Ensure we don't go below 0
-                        }
-                        inList = false;
-                        listType = '';
-                        indentLevel = 0;
+                    // Close lists that are at a higher indent level
+                    while (listStack.length > 0 && currentIndent <= listStack[listStack.length - 1].indent) {
+                        processedLines.push(`</${listStack.pop().type}>`);
                     }
 
+                    // Open new list if type or indent changes
+                    if (listStack.length === 0 || currentListType !== listStack[listStack.length - 1].type || currentIndent > listStack[listStack.length - 1].indent) {
+                        processedLines.push(`<${currentListType}>`);
+                        listStack.push({ type: currentListType, indent: currentIndent });
+                    }
+                    
+                    processedLines.push(`<li>${listItemContent}</li>`);
+                } else {
+                    // Close all open lists if a non-list item is encountered
+                    while (listStack.length > 0) {
+                        processedLines.push(`</${listStack.pop().type}>`);
+                    }
                     // Handle paragraphs, but not empty lines or lines already processed as blocks
                     if (line.trim() !== '' &&
                         !line.startsWith('<h') && !line.startsWith('<blockquote>') && !line.startsWith('<div class="code-block">')) {
@@ -1035,9 +1023,11 @@
                         processedLines.push(line); // Preserve already processed block elements
                     }
                 }
+            });
+            // Close any remaining open lists at the end
+            while (listStack.length > 0) {
+                processedLines.push(`</${listStack.pop().type}>`);
             }
-            if (inList) processedLines.push(`</${listType}>`); // Close any remaining open lists
-
             html = processedLines.join('\n');
 
             // --- Inline elements ---
@@ -1075,27 +1065,22 @@
 
 
         // --- Response Display & Typing Animation ---
-        async function displayResponse(fullContent, animate = true) {
-            responseArea.innerHTML = ''; // Clear previous content
-            responseArea.classList.add('visible');
-            const placeholderContent = `<p>Your journey with Gemini AI begins here. Type a question above and press Enter or the <span class="material-symbols-outlined" style="font-size: 0.9em; vertical-align: middle; color: var(--primary-glow);">play_arrow</span> button.</p><p>Your API Key will be securely stored in your browser's local storage for convenience.</p><p>You can ask follow-up questions, as Gemini now remembers the conversation context!</p>`;
-
-
-            if (!fullContent) {
-                responseArea.innerHTML = placeholderContent;
-                return;
-            }
-
+        async function displayResponse(fullHtmlContent, animate = true, isInitialMessage = false) {
+            responseArea.classList.add('visible'); // Ensure response area is visible
+            
             if (!animate) {
-                responseArea.innerHTML = fullContent;
+                responseArea.innerHTML = fullHtmlContent;
                 addCopyCodeButtons();
+                // Add fade-in class for all direct children for static content
+                Array.from(responseArea.children).forEach(child => child.classList.add('fade-in'));
                 scrollToBottom();
                 return;
             }
 
+            responseArea.innerHTML = ''; // Clear previous content for typing effect
             let currentContent = '';
             // Split by words, but also keep HTML tags intact for proper rendering
-            const words = fullContent.split(/(\s+|(?=<[^>]*>))/g);
+            const words = fullHtmlContent.split(/(\s+|(?=<[^>]*>))/g);
 
             for (const word of words) {
                 currentContent += word;
@@ -1105,8 +1090,17 @@
             }
 
             // Remove typing cursor after full content is displayed
-            responseArea.innerHTML = fullContent;
+            responseArea.innerHTML = fullHtmlContent;
             addCopyCodeButtons(); // Add copy buttons after the text is fully rendered
+            
+            // Add fade-in class to individual elements *after* typing is complete
+            // This allows them to animate into place if they are block elements
+            Array.from(responseArea.children).forEach((child, index) => {
+                setTimeout(() => {
+                    child.classList.add('fade-in');
+                }, index * 50); // Stagger fade-in for block elements
+            });
+
             scrollToBottom();
         }
 
@@ -1142,9 +1136,8 @@
                 const pre = codeBlock.querySelector('pre');
                 if (button && pre) {
                     // Remove existing event listener to prevent duplicates
-                    const oldButton = button.cloneNode(true);
-                    button.parentNode.replaceChild(oldButton, button);
-                    const newButton = oldButton;
+                    const newButton = button.cloneNode(true);
+                    button.parentNode.replaceChild(newButton, button);
 
                     newButton.addEventListener('click', () => {
                         const code = pre.textContent;
@@ -1350,10 +1343,6 @@
             } else {
                  searchInput.removeAttribute('aria-activedescendant');
             }
-            // Update input value only when navigating suggestions, not just on focus
-            // if (suggestionIndex !== -1) {
-            //     searchInput.value = currentSuggestions[suggestionIndex];
-            // }
             // Decided against auto-filling input with suggestion on arrow key to avoid disrupting user's original query.
             // User can press Enter to select.
         }
@@ -1475,15 +1464,27 @@
             // Initialize Voice Search
             initializeVoiceSearch();
 
+            // Initial AI welcome message (the "real thing")
+            const initialWelcomeMarkdown = `
+Hello there! I'm Gemini, ready to assist you.
+
+**Here's how you can interact with me:**
+*   Type your questions in the search bar above.
+*   Use the <span class="material-symbols-outlined" style="font-size: 0.9em; vertical-align: middle; color: var(--primary-glow);">mic</span> button for voice input.
+*   Press Enter or the <span class="material-symbols-outlined" style="font-size: 0.9em; vertical-align: middle; color: var(--primary-glow);">play_arrow</span> button to send your query.
+
+Your API Key (required for me to work!) will be securely stored in your browser's local storage. You can manage it using the "Manage API Key" link below.
+
+Feel free to ask me anything — I remember our conversation context!
+            `;
+
             // Give a tiny delay before initializing Gemini to ensure UI renders
-            setTimeout(() => {
-                initializeGemini();
+            setTimeout(async () => {
+                await initializeGemini();
+                // Display the welcome message as if Gemini typed it
+                displayResponse(formatMarkdown(initialWelcomeMarkdown), true, true);
             }, 100);
 
-            // Show initial message slightly after load for a smooth entry
-            setTimeout(() => {
-                responseArea.classList.add('visible');
-            }, 200);
 
             // Update clear button visibility on load if input already has text (e.g., browser autofill)
             if (searchInput.value.length > 0) {
