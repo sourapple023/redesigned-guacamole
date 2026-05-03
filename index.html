@@ -12,30 +12,28 @@
         /* CSS Variables for easy color adjustments (Dark Theme is default) */
         :root {
             --bg-dark: #0a0a0d;
-            --bg-gradient-start: #100f1a;
+            --bg-gradient-start: #121020; /* Slightly deeper start */
             --bg-gradient-end: #0a0a0d;
             --primary-glow: #00ffff; /* Cyan */
             --primary-glow-darker: #00e6e6;
             --text-light: #e0e0e0;
-            --text-medium: #888;
+            --text-medium: #a0a0a0; /* Slightly brighter medium text */
             --input-bg: #1a1a1a;
-            --response-bg: rgba(26, 26, 26, 0.85); /* Slightly less transparent */
-            --response-border: #333;
+            --response-bg: rgba(26, 26, 26, 0.9); /* Less transparent */
+            --response-border: #383838; /* Slightly lighter border for visibility */
             --code-bg: #2a2a2a;
-            --code-border: #444;
+            --code-border: #555; /* More distinct code border */
             --error-color: #ff6666;
             --button-icon-color: #e0e0e0; /* For theme toggle button */
             --link-color: #00ffff;
-            --modal-bg-color: var(--input-bg);
-            --modal-border-color: var(--response-border);
-            --suggestion-bg: #222;
-            --suggestion-hover-bg: #333;
+            --modal-bg-color: #22222a; /* Slightly darker modal */
+            --modal-border-color: #444;
+            --suggestion-bg: #262626; /* Slightly darker suggestion bg */
+            --suggestion-hover-bg: #3a3a3a;
             --typing-cursor: var(--primary-glow);
             --placeholder-color: var(--text-medium);
-            --subtle-shadow-dark: 0 0 5px rgba(0, 255, 255, 0.1);
-            --subtle-shadow-light: 0 0 5px rgba(0, 123, 255, 0.1);
-            --header-text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-            --item-fade-transition: all 0.5s ease-out;
+            --header-text-shadow: 0 0 12px rgba(0, 255, 255, 0.6); /* Refined header glow */
+            --item-fade-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother item animation */
         }
 
         /* Light Theme overrides */
@@ -45,33 +43,33 @@
             --bg-gradient-end: #e0e0e5;
             --primary-glow: #007bff; /* Blue for light theme */
             --primary-glow-darker: #0056b3;
-            --text-light: #333;
-            --text-medium: #666;
+            --text-light: #2c2c2c; /* Darker text for better contrast */
+            --text-medium: #777;
             --input-bg: #ffffff;
-            --response-bg: rgba(255, 255, 255, 0.95); /* Slightly less transparent */
-            --response-border: #ccc;
-            --code-bg: #e8e8f0;
-            --code-border: #d0d0d5;
+            --response-bg: rgba(255, 255, 255, 0.98); /* Almost opaque */
+            --response-border: #bbb; /* Lighter border */
+            --code-bg: #eff0f3; /* Lighter code bg */
+            --code-border: #d8d8e0;
             --error-color: #dc3545;
-            --button-icon-color: #333;
+            --button-icon-color: #444; /* Darker icon for light theme */
             --link-color: #0056b3;
-            --modal-bg-color: var(--input-bg);
-            --modal-border-color: var(--response-border);
-            --suggestion-bg: #f8f8f8;
-            --suggestion-hover-bg: #e0e0e5;
+            --modal-bg-color: #fcfcfc;
+            --modal-border-color: #d0d0d5;
+            --suggestion-bg: #ffffff;
+            --suggestion-hover-bg: #f0f0f5;
             --typing-cursor: var(--primary-glow-darker);
-            --placeholder-color: #999;
+            --placeholder-color: #a0a0a0;
             --header-text-shadow: none; /* No text shadow for header in light theme */
         }
 
         /* Basic Reset & Body Styling */
         body {
             margin: 0;
-            padding: 0;
+            padding: 5vh 0; /* Add vertical padding for breathing room */
             font-family: 'Poppins', sans-serif; /* Use Poppins */
             background: radial-gradient(circle at center, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             /* Adjusted background image opacity for a softer texture */
-            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.03' fill-rule='evenodd'%3E%3Cpath d='M0 0h3v3H0V0zm3 3h3v3H3V3z'/%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.02' fill-rule='evenodd'%3E%3Cpath d='M0 0h3v3H0V0zm3 3h3v3H3V3z'/%3E%3C/g%3E%3C/svg%3E");
             color: var(--text-light);
             display: flex;
             flex-direction: column;
@@ -87,13 +85,13 @@
 
         /* App Title */
         .app-title {
-            font-size: clamp(2em, 5vw, 3.5em); /* Responsive font size */
+            font-size: clamp(2.2em, 5vw, 3.8em); /* More responsive and slightly larger */
             color: var(--primary-glow);
             font-weight: 700;
             margin-bottom: 40px;
             text-shadow: var(--header-text-shadow);
             transition: color 0.5s ease, text-shadow 0.5s ease;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px; /* Subtle letter spacing */
             pointer-events: none; /* Don't interfere with clicks */
             user-select: none;
             text-align: center;
@@ -114,7 +112,7 @@
         /* Glowing Search Input */
         #searchInput {
             flex-grow: 1;
-            padding: 16px 20px; /* Slightly adjusted padding */
+            padding: 16px 20px;
             padding-right: 120px; /* Space for buttons */
             font-size: 1.15em;
             font-weight: 400;
@@ -125,10 +123,10 @@
             box-shadow: 0 0 8px rgba(0, 255, 255, 0.4),
                         0 0 20px rgba(0, 255, 255, 0.2),
                         inset 0 0 5px rgba(0, 255, 255, 0.1);
-            transition: all 0.3s ease-in-out, background-color 0.5s ease, border-radius 0.3s ease; /* Include theme transition */
+            transition: all 0.3s ease-in-out, background-color 0.5s ease, border-radius 0.3s ease, border-color 0.3s ease; /* Include border-color transition */
             outline: none;
             box-sizing: border-box;
-            text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+            text-shadow: 0 0 2px rgba(0, 255, 255, 0.1); /* Subtler text shadow for crispness */
             animation: input-pulse 3s infinite alternate ease-in-out;
             min-width: 0; /* Allow input to shrink */
         }
@@ -141,7 +139,7 @@
 
         #searchInput::placeholder {
             color: var(--placeholder-color);
-            opacity: 0.7;
+            opacity: 0.8; /* Slightly more opaque */
             transition: color 0.5s ease, opacity 0.5s ease;
         }
 
@@ -153,11 +151,13 @@
             background-color: #222; /* Darker on focus for dark theme */
             transform: scale(1.01);
             animation: none;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.3); /* Stronger glow on focus */
         }
 
         body.light-theme #searchInput:focus {
             background-color: #f8f8f8; /* Lighter on focus for light theme */
             box-shadow: 0 0 20px rgba(0, 123, 255, 0.6), 0 0 40px rgba(0, 123, 255, 0.3), inset 0 0 10px rgba(0, 123, 255, 0.1);
+            text-shadow: none;
         }
 
         /* Animation for input border radius when suggestions appear */
@@ -281,12 +281,12 @@
             transition: background-color 0.5s ease, border-color 0.5s ease, opacity 0.3s ease, transform 0.3s ease;
             z-index: 9; /* Below search bar, above content */
             opacity: 0;
-            transform: translateY(-5px);
+            transform: translateY(-5px); /* Initial state for animation */
             pointer-events: none; /* Prevent interaction when hidden */
         }
         #suggestions.visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0); /* Final state for animation */
             pointer-events: auto; /* Allow interaction when visible */
         }
         #suggestions li {
@@ -312,17 +312,17 @@
             background-color: var(--response-bg);
             border: 1px solid var(--response-border);
             border-radius: 12px;
-            padding: 25px;
+            padding: 30px; /* Increased padding */
             max-height: 55vh;
             overflow-y: auto;
             word-wrap: break-word;
             text-align: left;
             font-size: 1em;
-            line-height: 1.6;
+            line-height: 1.7; /* Slightly increased line height for readability */
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.08); /* Stronger shadow */
             opacity: 0;
             transform: translateY(20px);
-            transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease, text-shadow 0.5s ease; /* Include theme transitions */
+            transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease; /* Include theme transitions */
             z-index: 5;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
@@ -348,11 +348,19 @@
             transform: translateY(0);
         }
 
+        /* Inline icon styling - for 'play_arrow' in intro text */
+        p .inline-icon {
+            font-size: 1.05em; /* Slightly larger than 1em to match text cap height better */
+            vertical-align: -0.1em; /* Adjust alignment to visual center of text */
+            color: var(--primary-glow);
+            transition: color 0.5s ease;
+        }
+
         #responseArea p:last-child, #responseArea li:last-child {
              margin-bottom: 0;
         }
         #responseArea ul li, #responseArea ol li { /* Improved list item spacing */
-            margin-bottom: 0.7em;
+            margin-bottom: 0.8em; /* More space */
             padding-left: 0.2em;
         }
         #responseArea ul, #responseArea ol {
@@ -368,16 +376,16 @@
             border-bottom: 1px solid rgba(0, 255, 255, 0.2);
             padding-bottom: 0.5em;
             transition: color 0.5s ease, border-color 0.5s ease, text-shadow 0.5s ease;
-            text-shadow: 0 0 8px rgba(0, 255, 255, 0.3); /* Subtle glow for headings */
+            text-shadow: 0 0 6px rgba(0, 255, 255, 0.3); /* Subtler glow for headings */
         }
         body.light-theme #responseArea h1, body.light-theme #responseArea h2, body.light-theme #responseArea h3 {
             border-bottom: 1px solid rgba(0, 123, 255, 0.2);
             text-shadow: none; /* No text shadow in light theme */
         }
 
-        #responseArea h1 { font-size: 1.9em; } /* Slightly larger headings */
-        #responseArea h2 { font-size: 1.6em; }
-        #responseArea h3 { font-size: 1.4em; }
+        #responseArea h1 { font-size: 2em; } /* Slightly larger headings */
+        #responseArea h2 { font-size: 1.7em; }
+        #responseArea h3 { font-size: 1.5em; }
 
         #responseArea strong {
             color: var(--primary-glow);
@@ -443,6 +451,7 @@
             font-family: 'Consolas', 'Monaco', monospace;
             font-size: 0.9em;
             line-height: 1.5;
+            letter-spacing: 0.01em; /* Subtle letter spacing for code readability */
             box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.6); /* Deeper inset shadow */
             transition: background-color 0.5s ease, border-color 0.5s ease;
         }
@@ -524,6 +533,7 @@
         }
         #responseArea::-webkit-scrollbar-thumb:hover {
             background-color: var(--primary-glow-darker);
+            border-color: var(--primary-glow-darker); /* Match thumb color */
         }
 
         /* Scrollbar Styling for Firefox */
@@ -585,7 +595,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8); /* Slightly darker overlay */
+            background: rgba(0, 0, 0, 0.85); /* Darker overlay */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -607,9 +617,9 @@
             width: 90%;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.08); /* Stronger modal shadow */
             text-align: center;
-            transform: scale(0.95) translateY(-20px); /* Initial scale and translate for animation */
+            transform: scale(0.9) translateY(-30px); /* More pronounced initial state for animation */
             opacity: 0;
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
         }
         .modal-overlay.visible .api-key-modal-content {
             transform: scale(1) translateY(0);
@@ -715,7 +725,7 @@
             right: 20px;
             background: none;
             border: none;
-            font-size: 2.2em; /* Slightly larger */
+            font-size: 2.3em; /* Slightly larger */
             cursor: pointer;
             color: var(--button-icon-color);
             transition: color 0.3s ease, transform 0.3s ease;
@@ -725,7 +735,7 @@
         }
         #themeToggle:hover {
             color: var(--primary-glow);
-            transform: rotate(25deg) scale(1.15); /* More pronounced rotation and scale */
+            transform: rotate(30deg) scale(1.18); /* More pronounced rotation and scale */
         }
         #themeToggle:active {
             transform: scale(0.95);
@@ -733,39 +743,45 @@
 
         /* Media Queries for better responsiveness */
         @media (max-width: 480px) {
+            body {
+                padding: 3vh 0; /* Less padding on small screens */
+            }
             .app-title {
-                margin-bottom: 30px;
+                margin-bottom: 25px;
+                font-size: clamp(1.8em, 7vw, 2.5em); /* Adjust for smaller screens */
             }
             #searchInput {
-                padding: 14px 18px;
-                padding-right: 110px;
-                font-size: 1em;
+                padding: 12px 16px;
+                padding-right: 100px;
+                font-size: 0.95em;
             }
             .input-buttons {
-                right: 10px;
-                gap: 3px;
+                right: 8px;
+                gap: 2px;
             }
             .input-buttons button {
-                font-size: 1.3em;
+                font-size: 1.2em;
+                padding: 3px;
             }
             #sendButton {
-                font-size: 1.8em;
+                font-size: 1.6em;
             }
             #clearInputButton {
-                font-size: 1.1em;
+                font-size: 1em;
             }
             #voiceSearchButton {
-                font-size: 1.1em;
+                font-size: 1em;
             }
             #responseArea {
-                padding: 18px;
+                padding: 20px;
                 font-size: 0.9em;
+                min-height: 80px;
             }
             #responseArea h1 { font-size: 1.6em; }
-            #responseArea h2 { font-size: 1.3em; }
-            #responseArea h3 { font-size: 1.1em; }
+            #responseArea h2 { font-size: 1.4em; }
+            #responseArea h3 { font-size: 1.2em; }
             #responseArea ul, #responseArea ol {
-                padding-left: 18px;
+                padding-left: 20px;
             }
             .api-key-modal-content {
                 padding: 20px;
@@ -922,7 +938,7 @@
 
                     genAI = new window.GoogleGenerativeAI(geminiApiKey);
                     // --- START OF REQUIRED CHANGE FOR GEMINI 2.5 FLASH ---
-                    // Please verify the exact model ID for Gemini 2.5 Flash in Google AI Studio
+                    // Please verify the exact model ID for Gemini 1.5 Flash in Google AI Studio
                     // Common IDs: "gemini-pro", "gemini-1.5-flash", "gemini-1.5-pro"
                     model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Changed from "gemini-pro"
                     // --- END OF REQUIRED CHANGE FOR GEMINI 2.5 FLASH ---
@@ -986,7 +1002,6 @@
             // Lists - Process line by line to correctly handle nested lists (simple nesting) and paragraphs between lists
             const lines = html.split('\n');
             let processedLines = [];
-            let inList = false;
             let listStack = []; // To handle nested lists more robustly
 
             lines.forEach(line => {
@@ -1065,14 +1080,14 @@
 
 
         // --- Response Display & Typing Animation ---
-        async function displayResponse(fullHtmlContent, animate = true, isInitialMessage = false) {
+        async function displayResponse(fullHtmlContent, animate = true) {
             responseArea.classList.add('visible'); // Ensure response area is visible
             
             if (!animate) {
                 responseArea.innerHTML = fullHtmlContent;
                 addCopyCodeButtons();
-                // Add fade-in class for all direct children for static content
-                Array.from(responseArea.children).forEach(child => child.classList.add('fade-in'));
+                // Add fade-in class for all direct content-bearing children for static content
+                Array.from(responseArea.querySelectorAll('p, ul, ol, h1, h2, h3, blockquote, .code-block')).forEach(child => child.classList.add('fade-in'));
                 scrollToBottom();
                 return;
             }
@@ -1095,7 +1110,7 @@
             
             // Add fade-in class to individual elements *after* typing is complete
             // This allows them to animate into place if they are block elements
-            Array.from(responseArea.children).forEach((child, index) => {
+            Array.from(responseArea.querySelectorAll('p, ul, ol, h1, h2, h3, blockquote, .code-block')).forEach((child, index) => {
                 setTimeout(() => {
                     child.classList.add('fade-in');
                 }, index * 50); // Stagger fade-in for block elements
@@ -1466,12 +1481,12 @@
 
             // Initial AI welcome message (the "real thing")
             const initialWelcomeMarkdown = `
-Hello there! I'm Gemini, ready to assist you.
+Hello there! I'm Gemini, ready to assist you using the **Flash 1.5 model**.
 
 **Here's how you can interact with me:**
 *   Type your questions in the search bar above.
-*   Use the <span class="material-symbols-outlined" style="font-size: 0.9em; vertical-align: middle; color: var(--primary-glow);">mic</span> button for voice input.
-*   Press Enter or the <span class="material-symbols-outlined" style="font-size: 0.9em; vertical-align: middle; color: var(--primary-glow);">play_arrow</span> button to send your query.
+*   Use the <span class="material-symbols-outlined inline-icon">mic</span> button for voice input.
+*   Press Enter or the <span class="material-symbols-outlined inline-icon">play_arrow</span> button to send your query.
 
 Your API Key (required for me to work!) will be securely stored in your browser's local storage. You can manage it using the "Manage API Key" link below.
 
@@ -1482,7 +1497,7 @@ Feel free to ask me anything — I remember our conversation context!
             setTimeout(async () => {
                 await initializeGemini();
                 // Display the welcome message as if Gemini typed it
-                displayResponse(formatMarkdown(initialWelcomeMarkdown), true, true);
+                displayResponse(formatMarkdown(initialWelcomeMarkdown), true);
             }, 100);
 
 
