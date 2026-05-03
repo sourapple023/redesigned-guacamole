@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Glow Search Pro</title>
+    <title>Gemini Glow Search Pro (Upgraded)</title>
     <!-- Google Fonts - Poppins for a clean, modern look -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Material Symbols Outlined for icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
         /* CSS Variables for easy color adjustments (Dark Theme is default) */
         :root {
@@ -26,6 +28,9 @@
             --link-color: #00ffff;
             --modal-bg-color: var(--input-bg);
             --modal-border-color: var(--response-border);
+            --suggestion-bg: #222;
+            --suggestion-hover-bg: #333;
+            --typing-cursor: var(--primary-glow);
         }
 
         /* Light Theme overrides */
@@ -47,6 +52,9 @@
             --link-color: #0056b3;
             --modal-bg-color: var(--input-bg);
             --modal-border-color: var(--response-border);
+            --suggestion-bg: #f8f8f8;
+            --suggestion-hover-bg: #e0e0e5;
+            --typing-cursor: var(--primary-glow-darker);
         }
 
         /* Basic Reset & Body Styling */
@@ -81,6 +89,7 @@
         #searchInput {
             flex-grow: 1;
             padding: 18px 25px;
+            padding-right: 120px; /* Space for buttons */
             font-size: 1.15em;
             font-weight: 400;
             border: 2px solid var(--primary-glow);
@@ -134,50 +143,122 @@
             100% { box-shadow: 0 0 12px rgba(0, 123, 255, 0.4), 0 0 25px rgba(0, 123, 255, 0.2), inset 0 0 7px rgba(0, 123, 255, 0.1); }
         }
 
-        /* Seamless Send Button */
-        #sendButton {
+        /* Button group inside search input */
+        .input-buttons {
             position: absolute;
             right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px; /* Space between buttons */
+        }
+
+        .input-buttons button {
             background: none;
             border: none;
-            font-size: 2em;
             color: var(--primary-glow);
             cursor: pointer;
-            padding: 0 10px;
-            line-height: 1;
+            font-size: 1.5em; /* Icon size */
+            padding: 5px;
             transition: color 0.2s ease, transform 0.2s ease, filter 0.2s ease;
             outline: none;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
+            filter: drop-shadow(0 0 3px rgba(0, 255, 255, 0.3));
         }
 
-        body.light-theme #sendButton {
-            filter: drop-shadow(0 0 2px rgba(0, 123, 255, 0.3));
+        body.light-theme .input-buttons button {
+            filter: drop-shadow(0 0 1px rgba(0, 123, 255, 0.2));
         }
 
-        #sendButton:hover {
+        .input-buttons button:hover:not(:disabled) {
             color: var(--text-light);
             transform: scale(1.15);
-            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
         }
 
-        body.light-theme #sendButton:hover {
-            filter: drop-shadow(0 0 5px rgba(0, 123, 255, 0.5));
+        body.light-theme .input-buttons button:hover:not(:disabled) {
+            filter: drop-shadow(0 0 3px rgba(0, 123, 255, 0.4));
         }
 
-        #sendButton:active {
+        .input-buttons button:active:not(:disabled) {
             transform: scale(0.95);
-            filter: drop-shadow(0 0 2px rgba(0, 255, 255, 0.3));
         }
 
-        #sendButton:disabled {
+        .input-buttons button:disabled {
             color: #555;
             cursor: not-allowed;
-            filter: drop-shadow(0 0 0px rgba(0, 255, 255, 0.0));
+            filter: none;
         }
 
+        /* Specific styles for send button */
+        #sendButton {
+            font-size: 2em; /* Larger for send */
+            padding: 0 10px;
+        }
+
+        /* Clear button */
+        #clearInputButton {
+            display: none; /* Hidden by default */
+            font-size: 1.3em;
+            margin-right: -5px; /* Pull it slightly left */
+        }
+        #clearInputButton.visible {
+            display: block;
+        }
+
+        /* Voice search button */
+        #voiceSearchButton {
+            font-size: 1.3em;
+        }
+        #voiceSearchButton.listening {
+            color: #ff6666; /* Red when listening */
+            animation: pulse-red 1s infinite alternate;
+        }
+        @keyframes pulse-red {
+            0% { filter: drop-shadow(0 0 0px rgba(255, 102, 102, 0.5)); }
+            100% { filter: drop-shadow(0 0 8px rgba(255, 102, 102, 0.8)); }
+        }
+
+
+        /* Suggestions Dropdown */
+        #suggestions {
+            position: absolute;
+            top: 100%; /* Below the input */
+            left: 0;
+            right: 0;
+            background-color: var(--suggestion-bg);
+            border: 1px solid var(--response-border);
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none; /* Hidden by default */
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+            z-index: 9; /* Below search bar, above content */
+        }
+        #suggestions.visible {
+            display: block;
+        }
+        #suggestions li {
+            padding: 12px 25px;
+            cursor: pointer;
+            font-size: 0.95em;
+            color: var(--text-light);
+            transition: background-color 0.2s ease;
+        }
+        #suggestions li:hover, #suggestions li.active {
+            background-color: var(--suggestion-hover-bg);
+            color: var(--primary-glow);
+        }
+        #suggestions li:last-child {
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
 
         /* Response Area */
         #responseArea {
@@ -207,7 +288,7 @@
             transform: translateY(0);
         }
 
-        #responseArea p, #responseArea ul, #responseArea ol, #responseArea h1, #responseArea h2, #responseArea h3 {
+        #responseArea p, #responseArea ul, #responseArea ol, #responseArea h1, #responseArea h2, #responseArea h3, #responseArea div.code-block {
             margin: 0 0 1em 0;
             padding: 0;
         }
@@ -252,7 +333,21 @@
         #responseArea li {
             margin-bottom: 0.5em;
         }
+        #responseArea a {
+            color: var(--link-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        #responseArea a:hover {
+            color: var(--primary-glow-darker);
+            text-decoration: underline;
+        }
 
+        /* Code block container */
+        .code-block {
+            position: relative;
+            margin: 1.5em 0;
+        }
         #responseArea pre {
             background-color: var(--code-bg);
             border: 1px solid var(--code-border);
@@ -265,7 +360,6 @@
             font-family: 'Consolas', 'Monaco', monospace;
             font-size: 0.9em;
             line-height: 1.5;
-            margin: 1.5em 0;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
             transition: background-color 0.5s ease, border-color 0.5s ease;
         }
@@ -283,6 +377,43 @@
             background-color: transparent;
             padding: 0;
         }
+
+        /* Copy Code Button */
+        .copy-code-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: var(--text-light);
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.1s ease;
+            z-index: 10;
+        }
+        body.light-theme .copy-code-button {
+            background-color: rgba(255, 255, 255, 0.7);
+            color: var(--text-light);
+            border: 1px solid var(--response-border);
+        }
+        .copy-code-button:hover {
+            opacity: 1;
+            background-color: var(--primary-glow);
+            color: var(--bg-dark);
+            transform: translateY(-1px);
+        }
+        body.light-theme .copy-code-button:hover {
+            background-color: var(--primary-glow);
+            color: white;
+        }
+        .copy-code-button.copied {
+            background-color: #28a745; /* Green on copied */
+            color: white;
+        }
+
 
         /* Scrollbar Styling for Webkit Browsers (Chrome, Edge, Safari) */
         #responseArea::-webkit-scrollbar {
@@ -341,11 +472,25 @@
             40% { transform: translateY(-10px); }
         }
 
+        /* AI Typing Animation */
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em; /* Adjust to match line height */
+            background-color: var(--typing-cursor);
+            vertical-align: middle;
+            animation: blink-cursor 0.7s infinite;
+            margin-left: 2px;
+        }
+        @keyframes blink-cursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
         /* Error message style */
         .error-message {
             color: var(--error-color);
             font-weight: 500;
-            transition: color 0.5s ease;
         }
 
         /* --- API Key Modal --- */
@@ -507,28 +652,33 @@
     <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.1/dist/index.min.js"></script>
 
     <button id="themeToggle" aria-label="Toggle theme">
-        <!-- Sun icon for light theme, Moon for dark theme -->
-        <span class="icon-dark">🌙</span>
-        <span class="icon-light" style="display: none;">☀️</span>
+        <!-- Material Symbols Icons for theme toggle -->
+        <span class="material-symbols-outlined icon-dark">dark_mode</span>
+        <span class="material-symbols-outlined icon-light" style="display: none;">light_mode</span>
     </button>
 
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Ask Gemini something..." autofocus autocomplete="off">
-        <button id="sendButton">❯</button>
+        <input type="text" id="searchInput" placeholder="Ask Gemini something..." aria-label="Search or ask Gemini" autofocus autocomplete="off">
+        <div class="input-buttons">
+            <button id="clearInputButton" class="material-symbols-outlined" aria-label="Clear input">close</button>
+            <button id="voiceSearchButton" class="material-symbols-outlined" aria-label="Voice search">mic</button>
+            <button id="sendButton" aria-label="Send message">play_arrow</button>
+        </div>
+        <ul id="suggestions" role="listbox" aria-label="Search suggestions"></ul>
     </div>
 
-    <div id="responseArea">
-        <p>Your journey with Gemini AI begins here. Type a question above and press Enter or the glow button.</p>
+    <div id="responseArea" role="region" aria-live="polite">
+        <p>Your journey with Gemini AI begins here. Type a question above and press Enter or the <span class="material-symbols-outlined" style="font-size: 0.9em; vertical-align: middle; color: var(--primary-glow);">play_arrow</span> button.</p>
         <p>Your API Key will be securely stored in your browser's local storage for convenience.</p>
-        <p>If you encounter issues, try refreshing and re-entering your key, or check your browser's console (F12).</p>
+        <p>You can ask follow-up questions, as Gemini now remembers the conversation context!</p>
     </div>
 
     <a href="#" id="apiKeyLink">Manage API Key</a>
 
     <!-- API Key Modal -->
-    <div id="apiKeyModal" class="modal-overlay">
+    <div id="apiKeyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="apiKeyModalTitle">
         <div class="api-key-modal-content">
-            <h2>Enter Your Gemini API Key</h2>
+            <h2 id="apiKeyModalTitle">Enter Your Gemini API Key</h2>
             <p>To interact with Gemini AI, please provide your API key. You can generate one from <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--link-color);">Google AI Studio</a>.</p>
             <input type="text" id="apiKeyInput" class="api-key-modal-input" placeholder="Paste your API key here..." autocomplete="off">
             <div class="modal-button-group">
@@ -539,31 +689,44 @@
     </div>
 
     <script>
+        // --- DOM Elements ---
         const searchInput = document.getElementById('searchInput');
         const sendButton = document.getElementById('sendButton');
+        const clearInputButton = document.getElementById('clearInputButton');
+        const voiceSearchButton = document.getElementById('voiceSearchButton');
         const responseArea = document.getElementById('responseArea');
         const apiKeyLink = document.getElementById('apiKeyLink');
         const themeToggle = document.getElementById('themeToggle');
         const iconDark = themeToggle.querySelector('.icon-dark');
         const iconLight = themeToggle.querySelector('.icon-light');
+        const suggestionsList = document.getElementById('suggestions');
 
         const apiKeyModal = document.getElementById('apiKeyModal');
         const apiKeyInput = document.getElementById('apiKeyInput');
         const saveApiKeyButton = document.getElementById('saveApiKeyButton');
         const cancelApiKeyButton = document.getElementById('cancelApiKeyButton');
 
+        // --- Constants ---
         const API_KEY_STORAGE_KEY = 'geminiApiKey';
         const THEME_STORAGE_KEY = 'userTheme';
+        const TYPING_SPEED = 20; // Milliseconds per character
+        const DEBOUNCE_DELAY = 300; // Milliseconds for autosuggest debounce
 
+        // --- Global State ---
         let geminiApiKey = localStorage.getItem(API_KEY_STORAGE_KEY);
         let genAI;
         let model;
+        let chatSession; // For conversational context
+        let currentSuggestions = [];
+        let suggestionIndex = -1;
+        let isGenerating = false; // Flag to prevent multiple requests
+        let speechRecognition; // Web Speech API
 
         // --- Theme Toggle Logic ---
         function applyTheme(theme) {
             document.body.classList.toggle('light-theme', theme === 'light');
-            iconDark.style.display = theme === 'dark' ? 'inline' : 'none';
-            iconLight.style.display = theme === 'light' ? 'inline' : 'none';
+            iconDark.style.display = theme === 'dark' ? 'inline-flex' : 'none';
+            iconLight.style.display = theme === 'light' ? 'inline-flex' : 'none';
             localStorage.setItem(THEME_STORAGE_KEY, theme);
         }
 
@@ -584,7 +747,6 @@
             apiKeyModal.classList.remove('visible');
         }
 
-        // Function to handle API Key input
         function handleApiKeyInput() {
             const key = apiKeyInput.value.trim();
             if (key) {
@@ -593,160 +755,450 @@
                 hideApiKeyModal();
                 initializeGemini();
             } else {
-                alert("API Key cannot be empty!"); // Simple validation
+                alert("API Key cannot be empty!");
             }
         }
 
-        // Initialize Gemini AI
+        // --- Gemini AI Initialization ---
         async function initializeGemini() {
             if (geminiApiKey) {
                 try {
-                    if (typeof window.GoogleGenerativeAI !== 'function') {
-                        // Wait for the SDK to load if it's not immediately available
-                        await new Promise(resolve => {
+                    // Check if SDK is already loaded or load it
+                    if (typeof window.GoogleGenerativeAI === 'undefined') {
+                        console.log("Loading Gemini AI SDK script...");
+                        await new Promise((resolve, reject) => {
                             const script = document.createElement('script');
                             script.src = "https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.1/dist/index.min.js";
                             script.onload = resolve;
-                            script.onerror = () => {
-                                console.error("Failed to load Gemini AI SDK script.");
-                                throw new Error("Google Generative AI SDK script failed to load.");
-                            };
+                            script.onerror = () => reject(new Error("Google Generative AI SDK script failed to load."));
                             document.head.appendChild(script);
                         });
-                        if (typeof window.GoogleGenerativeAI !== 'function') {
+                        if (typeof window.GoogleGenerativeAI === 'undefined') {
                             throw new Error("Google Generative AI SDK not loaded after attempt. Check internet/extensions.");
                         }
                     }
 
                     genAI = new window.GoogleGenerativeAI(geminiApiKey);
                     model = genAI.getGenerativeModel({ model: "gemini-pro" });
-                    console.log("Gemini AI model initialized successfully.");
+                    chatSession = model.startChat({ history: [] }); // Initialize chat session
+                    console.log("Gemini AI model and chat session initialized successfully.");
                     sendButton.disabled = false;
                     searchInput.disabled = false;
                     searchInput.placeholder = "Ask Gemini something...";
+                    searchInput.focus();
                 } catch (error) {
                     console.error("Failed to initialize Gemini AI:", error);
-                    let errorMessage = `Failed to initialize Gemini AI. Error: ${error.message}.`;
+                    let errorMessage = `Failed to initialize Gemini AI: ${error.message}.`;
                     if (error.message.includes('SDK not loaded')) {
-                         errorMessage += " Please check your internet connection or browser extensions (e.g., ad-blockers) that might block external scripts.";
-                    } else if (error.message.includes('API_KEY_INVALID')) {
-                        errorMessage += " Your API key seems invalid. Please click 'Manage API Key' to re-enter it.";
+                        errorMessage += " Please check your internet connection or browser extensions (e.g., ad-blockers) that might block external scripts.";
+                    } else if (error.message.includes('API_KEY_INVALID') || error.message.includes('401')) { // 401 is common for invalid key
+                        errorMessage = "Your API key seems invalid or unauthorized. Please click 'Manage API Key' to re-enter it.";
                         localStorage.removeItem(API_KEY_STORAGE_KEY);
                         geminiApiKey = null;
+                        showApiKeyModal(); // Show modal if key is invalid
+                    } else if (error.message.includes('500') || error.message.includes('internal error')) {
+                         errorMessage = "An internal server error occurred with Gemini. Please try again later.";
                     }
-                    responseArea.innerHTML = `<p class="error-message">${errorMessage}</p>`;
+                    displayResponse(`<p class="error-message">${errorMessage}</p>`);
                     sendButton.disabled = true;
                     searchInput.disabled = true;
                     searchInput.placeholder = "Initialization failed.";
-                    // If API key is invalid or missing, show modal again
-                    if (!geminiApiKey || error.message.includes('API_KEY_INVALID')) {
-                         showApiKeyModal();
-                    }
+                    if (!geminiApiKey) showApiKeyModal();
                 }
             } else {
-                showApiKeyModal(); // Show modal if key is not found
+                showApiKeyModal(); // Show modal if key is not found on load
                 sendButton.disabled = true;
                 searchInput.disabled = true;
                 searchInput.placeholder = "API Key required...";
             }
         }
 
-        // Improved Markdown to HTML formatter
+        // --- Markdown to HTML Conversion (More Robust) ---
         function formatMarkdown(markdownText) {
-            let html = markdownText;
+            // Using a simple regex-based parser. For complex markdown,
+            // consider a library like `marked.js` or `showdown.js`.
+            let html = markdownText || '';
+
+            // Ensure consistent newlines for processing
+            html = html.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
             // Handle code blocks (must be first to prevent other regexes from messing with it)
             html = html.replace(/```(\w*)\n([\s\S]*?)```/gm, (match, lang, code) => {
-                const languageClass = lang ? `class="language-${lang.toLowerCase()}"` : '';
-                return `<pre><code ${languageClass}>${code.trim()}</code></pre>`;
+                const languageClass = lang ? `language-${lang.toLowerCase()}` : '';
+                return `<div class="code-block"><button class="copy-code-button">Copy</button><pre><code class="${languageClass}">${escapeHtml(code.trim())}</code></pre></div>`;
             });
-            html = html.replace(/`([^`]+)`/g, '<code>$1</code>'); // Inline code
 
-            // Basic replacements for text formatting
-            html = html
-                .replace(/^### (.*$)/gim, '<h3>$1</h3>')   // H3
-                .replace(/^## (.*$)/gim, '<h2>$1</h2>')    // H2
-                .replace(/^# (.*$)/gim, '<h1>$1</h1>')     // H1
-                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>') // Bold
-                .replace(/\*(.*?)\*/gim, '<em>$1</em>')       // Italic (after bold to prevent double matches)
-                .replace(/^- (.*$)/gim, '<li>$1</li>')    // Unordered list items (simple)
-                .replace(/^\d+\. (.*$)/gim, '<li>$1</li>'); // Ordered list items (simple)
+            // Handle inline code
+            html = html.replace(/`([^`]+)`/g, (match, code) => `<code>${escapeHtml(code)}</code>`);
 
-            // Wrap list items in ul/ol if found, but avoid wrapping everything
-            if (html.includes('<li>') && !html.includes('<ul>') && !html.includes('<ol>')) {
-                const isOrdered = html.match(/^<li>\d+\./m);
-                const listTag = isOrdered ? 'ol' : 'ul';
-                html = `<${listTag}>${html}</${listTag}>`;
-            }
+            // Blockquotes
+            html = html.replace(/^> (.*$)/gim, '<blockquote><p>$1</p></blockquote>');
 
-            // Replace remaining newlines with <br> for paragraphs
-            html = html.replace(/\n/g, '<br>');
+            // Headings
+            html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
 
-            // Fix multiple <br> inside list items (a side effect of replacing all \n)
-            html = html.replace(/<li><br>/g, '<li>');
-            html = html.replace(/<br><\/li>/g, '</li>');
+            // Bold and Italic (order matters)
+            html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+            html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
 
-            // Replace multiple <br> tags with just one, except after block elements
-            html = html.replace(/(<br>\s*){2,}/g, '<br><br>');
+            // Lists - Split into lines, process lists, then join back for paragraphs
+            const lines = html.split('\n');
+            let processedLines = [];
+            let inList = false;
+            let listType = ''; // 'ul' or 'ol'
+
+            lines.forEach(line => {
+                const ulMatch = line.match(/^[*-] (.*)/);
+                const olMatch = line.match(/^(\d+)\. (.*)/);
+
+                if (ulMatch) {
+                    if (!inList || listType !== 'ul') {
+                        if (inList) processedLines.push(`</${listType}>`);
+                        processedLines.push('<ul>');
+                        inList = true;
+                        listType = 'ul';
+                    }
+                    processedLines.push(`<li>${ulMatch[1].trim()}</li>`);
+                } else if (olMatch) {
+                    if (!inList || listType !== 'ol') {
+                        if (inList) processedLines.push(`</${listType}>`);
+                        processedLines.push('<ol>');
+                        inList = true;
+                        listType = 'ol';
+                    }
+                    processedLines.push(`<li>${olMatch[2].trim()}</li>`);
+                } else {
+                    if (inList) {
+                        processedLines.push(`</${listType}>`);
+                        inList = false;
+                    }
+                    // Handle paragraphs, but not empty lines or lines already processed as blocks
+                    if (line.trim() !== '' && !line.startsWith('<h') && !line.startsWith('<blockquote>') && !line.startsWith('<div class="code-block">')) {
+                        processedLines.push(`<p>${line.trim()}</p>`);
+                    } else if (line.trim() !== '') {
+                        processedLines.push(line); // Preserve already processed block elements
+                    }
+                }
+            });
+            if (inList) processedLines.push(`</${listType}>`);
+            html = processedLines.join('\n');
+
+            // Remove empty paragraph tags (can result from markdown processing)
+            html = html.replace(/<p>\s*<\/p>/g, '');
+
+            // Convert remaining newlines that aren't inside block elements to <br> for spacing
+            // This is a rough heuristic; a full markdown parser would handle this better.
+            html = html.replace(/([^\n])\n(?![<])/g, '$1<br>');
 
             return html;
         }
 
-        // Send message to Gemini
+        // Helper to prevent XSS (Cross-Site Scripting) in dynamically inserted content
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+        // --- Response Display & Typing Animation ---
+        async function displayResponse(fullHtmlContent) {
+            responseArea.innerHTML = ''; // Clear previous content
+            responseArea.classList.add('visible');
+            let currentContent = '';
+            const words = fullHtmlContent.split(/(\s+|(?=<[^>]*>))/); // Split by spaces or HTML tags
+
+            for (const word of words) {
+                currentContent += word;
+                responseArea.innerHTML = currentContent + '<span class="typing-cursor"></span>';
+                scrollToBottom(); // Keep scrolling as content appears
+                await new Promise(resolve => setTimeout(resolve, TYPING_SPEED));
+            }
+
+            // Remove typing cursor after full content is displayed
+            responseArea.innerHTML = fullHtmlContent;
+            addCopyCodeButtons(); // Add copy buttons after the text is fully rendered
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            responseArea.scrollTop = responseArea.scrollHeight;
+        }
+
+        function setLoadingState(isLoading) {
+            isGenerating = isLoading;
+            sendButton.disabled = isLoading;
+            searchInput.disabled = isLoading;
+            voiceSearchButton.disabled = isLoading;
+            clearInputButton.disabled = isLoading;
+
+            if (isLoading) {
+                sendButton.innerHTML = `<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>`;
+                searchInput.placeholder = "Gemini is thinking...";
+            } else {
+                sendButton.innerHTML = `play_arrow`; // Material Symbols icon
+                searchInput.placeholder = "Ask Gemini something...";
+                searchInput.focus(); // Return focus to input
+            }
+        }
+
+        // --- Copy Code Functionality ---
+        function addCopyCodeButtons() {
+            document.querySelectorAll('.code-block').forEach(codeBlock => {
+                const button = codeBlock.querySelector('.copy-code-button');
+                const pre = codeBlock.querySelector('pre');
+                if (button && pre) {
+                    button.addEventListener('click', () => {
+                        const code = pre.textContent;
+                        navigator.clipboard.writeText(code).then(() => {
+                            button.textContent = 'Copied!';
+                            button.classList.add('copied');
+                            setTimeout(() => {
+                                button.textContent = 'Copy';
+                                button.classList.remove('copied');
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Failed to copy code: ', err);
+                            alert('Failed to copy code.');
+                        });
+                    });
+                }
+            });
+        }
+
+        // --- Send Message to Gemini ---
         async function sendMessage() {
             const promptText = searchInput.value.trim();
-            if (!promptText) return;
+            if (!promptText || isGenerating) return;
 
             if (!geminiApiKey) {
-                responseArea.innerHTML = '<p class="error-message">No Gemini API Key found. Please click "Manage API Key" below to enter it.</p>';
+                displayResponse('<p class="error-message">No Gemini API Key found. Please click "Manage API Key" below to enter it.</p>');
                 showApiKeyModal();
                 return;
             }
-            if (!model) {
-                responseArea.innerHTML = '<p class="error-message">Gemini model not initialized. Please refresh the page or re-enter your API key.</p>';
+            if (!chatSession) {
+                displayResponse('<p class="error-message">Gemini chat session not initialized. Please refresh the page or re-enter your API key.</p>');
+                initializeGemini(); // Try to re-initialize
                 return;
             }
 
             searchInput.value = ''; // Clear input
-            sendButton.disabled = true;
-            searchInput.disabled = true;
-            searchInput.placeholder = "Gemini is thinking...";
-
-            responseArea.classList.remove('visible'); // Hide old response instantly for a fresh animation
-            responseArea.innerHTML = `<p>Thinking<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></p>`;
-            responseArea.classList.add('visible');
-            responseArea.scrollTop = responseArea.scrollHeight; // Scroll to loading dots
+            clearInputButton.classList.remove('visible'); // Hide clear button
+            hideSuggestions();
+            setLoadingState(true);
 
             try {
-                const result = await model.generateContent(promptText);
+                // Add user's message to chat history implicitly by calling send
+                const result = await chatSession.sendMessage(promptText);
                 const response = await result.response;
                 const text = response.text();
-                responseArea.innerHTML = formatMarkdown(text);
+                await displayResponse(formatMarkdown(text));
             } catch (error) {
                 console.error("Error calling Gemini AI:", error);
                 let errorMessage = `Error: ${error.message}.`;
-                if (error.message.includes('API key not valid') || error.message.includes('API_KEY_INVALID')) {
-                    errorMessage = "Your API key seems invalid. Please click 'Manage API Key' to re-enter it.";
+                if (error.message.includes('API key not valid') || error.message.includes('API_KEY_INVALID') || error.message.includes('401')) {
+                    errorMessage = "Your API key seems invalid or unauthorized. Please click 'Manage API Key' to re-enter it.";
                     localStorage.removeItem(API_KEY_STORAGE_KEY);
                     geminiApiKey = null;
                     showApiKeyModal();
-                } else if (error.message.includes('Quota exceeded')) {
+                } else if (error.message.includes('Quota exceeded') || error.message.includes('429')) {
                     errorMessage = "You might have exceeded your Gemini API quota. Please check your Google Cloud Console.";
-                } else if (error.message.includes('undefined is not a constructor')) {
+                } else if (error.message.includes('undefined is not a constructor') || error.message.includes('SDK not loaded')) {
                     errorMessage = "Gemini SDK failed to load. Check internet, ad-blockers, or browser console (F12).";
-                } else {
-                     errorMessage = "An unexpected error occurred. Please try again later. Check browser console for details.";
+                } else if (error.message.includes('500') || error.message.includes('internal error')) {
+                    errorMessage = "An internal server error occurred with Gemini. Please try again later.";
+                } else if (error.message.includes('400') || error.message.includes('bad request')) {
+                    errorMessage = "The request to Gemini was malformed. This might be due to content policy violations or an issue with the prompt.";
                 }
-                responseArea.innerHTML = `<p class="error-message">${errorMessage}</p>`;
+                displayResponse(`<p class="error-message">${errorMessage}</p>`);
             } finally {
-                sendButton.disabled = false;
-                searchInput.disabled = false;
-                searchInput.focus();
-                searchInput.placeholder = "Ask Gemini something...";
-                responseArea.classList.add('visible');
-                responseArea.scrollTop = responseArea.scrollHeight; // Auto-scroll to bottom of response
+                setLoadingState(false);
             }
         }
+
+        // --- Autosuggest / Autocomplete Logic ---
+        const predefinedSuggestions = [
+            "Explain quantum computing in simple terms",
+            "Give me ideas for a 3-course meal",
+            "Write a short story about a brave knight",
+            "What's the capital of France?",
+            "How does photosynthesis work?",
+            "Suggest some healthy breakfast options",
+            "Tell me a fun fact about space",
+            "What are the benefits of exercise?",
+            "Summarize the plot of Hamlet",
+            "Write a Python function to sort a list",
+            "Describe the history of artificial intelligence"
+        ];
+
+        function showSuggestions() {
+            const query = searchInput.value.toLowerCase();
+            suggestionsList.innerHTML = '';
+            suggestionIndex = -1; // Reset selection
+
+            if (query.length < 2) { // Only show suggestions for longer queries
+                hideSuggestions();
+                return;
+            }
+
+            currentSuggestions = predefinedSuggestions.filter(s =>
+                s.toLowerCase().includes(query)
+            ).slice(0, 5); // Limit to 5 suggestions
+
+            if (currentSuggestions.length > 0) {
+                currentSuggestions.forEach((s, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = s;
+                    li.setAttribute('role', 'option');
+                    li.setAttribute('id', `suggestion-${index}`);
+                    li.addEventListener('click', () => {
+                        searchInput.value = s;
+                        sendMessage();
+                        hideSuggestions();
+                    });
+                    suggestionsList.appendChild(li);
+                });
+                suggestionsList.classList.add('visible');
+                searchInput.setAttribute('aria-expanded', 'true');
+            } else {
+                hideSuggestions();
+            }
+        }
+
+        function hideSuggestions() {
+            suggestionsList.classList.remove('visible');
+            suggestionsList.innerHTML = '';
+            searchInput.setAttribute('aria-expanded', 'false');
+        }
+
+        let debounceTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => {
+                showSuggestions();
+            }, DEBOUNCE_DELAY);
+
+            if (searchInput.value.length > 0) {
+                clearInputButton.classList.add('visible');
+            } else {
+                clearInputButton.classList.remove('visible');
+                hideSuggestions();
+            }
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (!suggestionsList.classList.contains('visible') || currentSuggestions.length === 0) return;
+
+            const items = suggestionsList.children;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (suggestionIndex < currentSuggestions.length - 1) {
+                    suggestionIndex++;
+                } else {
+                    suggestionIndex = 0; // Wrap around
+                }
+                updateSuggestionSelection(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (suggestionIndex > 0) {
+                    suggestionIndex--;
+                } else {
+                    suggestionIndex = currentSuggestions.length - 1; // Wrap around
+                }
+                updateSuggestionSelection(items);
+            } else if (e.key === 'Enter' && suggestionIndex !== -1) {
+                e.preventDefault();
+                searchInput.value = currentSuggestions[suggestionIndex];
+                sendMessage();
+                hideSuggestions();
+            } else if (e.key === 'Escape') {
+                hideSuggestions();
+            }
+        });
+
+        function updateSuggestionSelection(items) {
+            for (let i = 0; i < items.length; i++) {
+                items[i].classList.remove('active');
+                items[i].setAttribute('aria-selected', 'false');
+            }
+            if (suggestionIndex !== -1) {
+                items[suggestionIndex].classList.add('active');
+                items[suggestionIndex].setAttribute('aria-selected', 'true');
+                searchInput.setAttribute('aria-activedescendant', `suggestion-${suggestionIndex}`);
+                suggestionsList.scrollTop = items[suggestionIndex].offsetTop - suggestionsList.offsetTop - suggestionsList.clientHeight / 2;
+            } else {
+                 searchInput.removeAttribute('aria-activedescendant');
+            }
+            searchInput.value = suggestionIndex !== -1 ? currentSuggestions[suggestionIndex] : searchInput.value;
+        }
+
+        // Close suggestions if clicked outside
+        document.addEventListener('click', (e) => {
+            if (!searchContainer.contains(e.target) && suggestionsList.classList.contains('visible')) {
+                hideSuggestions();
+            }
+        });
+
+
+        // --- Voice Search Logic ---
+        function initializeVoiceSearch() {
+            if ('webkitSpeechRecognition' in window) {
+                speechRecognition = new webkitSpeechRecognition();
+                speechRecognition.continuous = false; // Listen for a single utterance
+                speechRecognition.interimResults = false; // Only return final results
+                speechRecognition.lang = 'en-US'; // Set language
+
+                speechRecognition.onstart = () => {
+                    voiceSearchButton.classList.add('listening');
+                    searchInput.placeholder = "Listening...";
+                    searchInput.value = "";
+                    searchInput.focus();
+                };
+
+                speechRecognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    searchInput.value = transcript;
+                    voiceSearchButton.classList.remove('listening');
+                    sendMessage(); // Send message automatically after voice input
+                };
+
+                speechRecognition.onerror = (event) => {
+                    console.error('Speech Recognition Error:', event.error);
+                    voiceSearchButton.classList.remove('listening');
+                    searchInput.placeholder = "Voice search failed.";
+                    if (event.error === 'not-allowed') {
+                        alert("Microphone access blocked. Please enable it in your browser settings.");
+                    } else if (event.error === 'no-speech') {
+                         searchInput.placeholder = "No speech detected. Try again?";
+                    }
+                };
+
+                speechRecognition.onend = () => {
+                    voiceSearchButton.classList.remove('listening');
+                    if (!isGenerating && searchInput.value === "") { // Only reset placeholder if not generating and no text
+                        searchInput.placeholder = "Ask Gemini something...";
+                    }
+                };
+
+                voiceSearchButton.addEventListener('click', () => {
+                    if (isGenerating) return;
+                    if (voiceSearchButton.classList.contains('listening')) {
+                        speechRecognition.stop();
+                    } else {
+                        speechRecognition.start();
+                    }
+                });
+            } else {
+                voiceSearchButton.style.display = 'none'; // Hide button if not supported
+                console.warn("Web Speech API not supported in this browser.");
+            }
+        }
+
 
         // --- Event Listeners ---
         sendButton.addEventListener('click', sendMessage);
@@ -754,6 +1206,12 @@
             if (e.key === 'Enter') {
                 sendMessage();
             }
+        });
+        clearInputButton.addEventListener('click', () => {
+            searchInput.value = '';
+            clearInputButton.classList.remove('visible');
+            searchInput.focus();
+            hideSuggestions();
         });
         apiKeyLink.addEventListener('click', (e) => {
             e.preventDefault();
@@ -776,6 +1234,9 @@
             const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
             applyTheme(savedTheme);
 
+            // Initialize Voice Search
+            initializeVoiceSearch();
+
             // Give a tiny delay before initializing Gemini to ensure UI renders
             setTimeout(() => {
                 initializeGemini();
@@ -785,6 +1246,10 @@
             setTimeout(() => {
                 responseArea.classList.add('visible');
             }, 200);
+
+            // Set up ARIA live region for dynamic content
+            responseArea.setAttribute('aria-live', 'polite');
+            responseArea.setAttribute('aria-atomic', 'false');
         });
     </script>
 </body>
