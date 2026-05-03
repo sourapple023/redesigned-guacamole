@@ -7,7 +7,7 @@
     <!-- Google Fonts - Poppins for a clean, modern look -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* CSS Variables for easy color adjustments */
+        /* CSS Variables for easy color adjustments (Dark Theme is default) */
         :root {
             --bg-dark: #0a0a0d;
             --bg-gradient-start: #100f1a;
@@ -21,6 +21,32 @@
             --response-border: #333;
             --code-bg: #2a2a2a;
             --code-border: #444;
+            --error-color: #ff6666;
+            --button-icon-color: #e0e0e0; /* For theme toggle button */
+            --link-color: #00ffff;
+            --modal-bg-color: var(--input-bg);
+            --modal-border-color: var(--response-border);
+        }
+
+        /* Light Theme overrides */
+        body.light-theme {
+            --bg-dark: #f0f0f5;
+            --bg-gradient-start: #ffffff;
+            --bg-gradient-end: #e0e0e5;
+            --primary-glow: #007bff; /* Blue for light theme */
+            --primary-glow-darker: #0056b3;
+            --text-light: #333;
+            --text-medium: #666;
+            --input-bg: #ffffff;
+            --response-bg: rgba(255, 255, 255, 0.9);
+            --response-border: #ccc;
+            --code-bg: #e8e8f0;
+            --code-border: #d0d0d5;
+            --error-color: #dc3545;
+            --button-icon-color: #333;
+            --link-color: #0056b3;
+            --modal-bg-color: var(--input-bg);
+            --modal-border-color: var(--response-border);
         }
 
         /* Basic Reset & Body Styling */
@@ -29,16 +55,15 @@
             padding: 0;
             font-family: 'Poppins', sans-serif; /* Use Poppins */
             background: radial-gradient(circle at center, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
-            /* Optional: subtle noise texture */
-            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 0h3v3H0V0zm3 3h3v3H3V3z'/%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.08' fill-rule='evenodd'%3E%3Cpath d='M0 0h3v3H0V0zm3 3h3v3H3V3z'/%3E%3C/g%3E%3C/svg%3E");
             color: var(--text-light);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden; /* Prevent horizontal scroll */
-            transition: background-color 0.5s ease;
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.5s ease; /* Smooth theme transitions */
         }
 
         /* Container for the search bar and button */
@@ -49,7 +74,7 @@
             max-width: 600px;
             position: relative;
             margin-bottom: 30px;
-            z-index: 10; /* Ensure it's above other elements if needed */
+            z-index: 10;
         }
 
         /* Glowing Search Input */
@@ -62,15 +87,20 @@
             border-radius: 30px;
             background-color: var(--input-bg);
             color: var(--text-light);
-            /* Layered box-shadow for deeper glow */
             box-shadow: 0 0 8px rgba(0, 255, 255, 0.4),
                         0 0 20px rgba(0, 255, 255, 0.2),
                         inset 0 0 5px rgba(0, 255, 255, 0.1);
-            transition: all 0.3s ease-in-out;
+            transition: all 0.3s ease-in-out, background-color 0.5s ease; /* Include theme transition */
             outline: none;
             box-sizing: border-box;
-            text-shadow: 0 0 5px rgba(0, 255, 255, 0.3); /* Subtle text glow */
-            animation: input-pulse 3s infinite alternate ease-in-out; /* Gentle pulse */
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+            animation: input-pulse 3s infinite alternate ease-in-out;
+        }
+
+        body.light-theme #searchInput {
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.3), 0 0 20px rgba(0, 123, 255, 0.1), inset 0 0 5px rgba(0, 123, 255, 0.05);
+            text-shadow: none;
+            animation: input-pulse-light 3s infinite alternate ease-in-out;
         }
 
         #searchInput::placeholder {
@@ -84,14 +114,24 @@
                         0 0 40px rgba(0, 255, 255, 0.5),
                         inset 0 0 10px rgba(0, 255, 255, 0.2);
             background-color: #222;
-            transform: scale(1.01); /* Slight zoom on focus */
-            animation: none; /* Stop pulse on focus */
+            transform: scale(1.01);
+            animation: none;
         }
 
-        /* Input pulse animation */
+        body.light-theme #searchInput:focus {
+            background-color: #f8f8f8;
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.6), 0 0 40px rgba(0, 123, 255, 0.3), inset 0 0 10px rgba(0, 123, 255, 0.1);
+        }
+
+        /* Input pulse animation - Dark Theme */
         @keyframes input-pulse {
             0% { box-shadow: 0 0 8px rgba(0, 255, 255, 0.4), 0 0 20px rgba(0, 255, 255, 0.2), inset 0 0 5px rgba(0, 255, 255, 0.1); }
             100% { box-shadow: 0 0 12px rgba(0, 255, 255, 0.6), 0 0 25px rgba(0, 255, 255, 0.3), inset 0 0 7px rgba(0, 255, 255, 0.15); }
+        }
+        /* Input pulse animation - Light Theme */
+        @keyframes input-pulse-light {
+            0% { box-shadow: 0 0 8px rgba(0, 123, 255, 0.3), 0 0 20px rgba(0, 123, 255, 0.1), inset 0 0 5px rgba(0, 123, 255, 0.05); }
+            100% { box-shadow: 0 0 12px rgba(0, 123, 255, 0.4), 0 0 25px rgba(0, 123, 255, 0.2), inset 0 0 7px rgba(0, 123, 255, 0.1); }
         }
 
         /* Seamless Send Button */
@@ -100,7 +140,7 @@
             right: 15px;
             background: none;
             border: none;
-            font-size: 2em; /* Slightly larger */
+            font-size: 2em;
             color: var(--primary-glow);
             cursor: pointer;
             padding: 0 10px;
@@ -110,13 +150,21 @@
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5)); /* Glow for the button symbol */
+            filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
+        }
+
+        body.light-theme #sendButton {
+            filter: drop-shadow(0 0 2px rgba(0, 123, 255, 0.3));
         }
 
         #sendButton:hover {
             color: var(--text-light);
-            transform: scale(1.15); /* More pronounced enlarge */
+            transform: scale(1.15);
             filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+        }
+
+        body.light-theme #sendButton:hover {
+            filter: drop-shadow(0 0 5px rgba(0, 123, 255, 0.5));
         }
 
         #sendButton:active {
@@ -137,20 +185,19 @@
             max-width: 600px;
             background-color: var(--response-bg);
             border: 1px solid var(--response-border);
-            border-radius: 12px; /* Slightly more rounded */
-            padding: 25px; /* More padding */
-            max-height: 55vh; /* Max height to allow scrolling for long responses */
+            border-radius: 12px;
+            padding: 25px;
+            max-height: 55vh;
             overflow-y: auto;
             word-wrap: break-word;
             text-align: left;
             font-size: 1em;
             line-height: 1.6;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.05); /* Deeper shadow */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.05);
             opacity: 0;
             transform: translateY(20px);
-            transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother transition */
-            z-index: 5; /* Below search bar */
-            /* Frosted glass effect (if supported) */
+            transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease; /* Include theme transitions */
+            z-index: 5;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
         }
@@ -161,7 +208,7 @@
         }
 
         #responseArea p, #responseArea ul, #responseArea ol, #responseArea h1, #responseArea h2, #responseArea h3 {
-            margin: 0 0 1em 0; /* More consistent spacing */
+            margin: 0 0 1em 0;
             padding: 0;
         }
         #responseArea p:last-child, #responseArea li:last-child {
@@ -174,7 +221,12 @@
             margin-top: 1.5em;
             border-bottom: 1px solid rgba(0, 255, 255, 0.2);
             padding-bottom: 0.5em;
+            transition: color 0.5s ease, border-color 0.5s ease;
         }
+        body.light-theme #responseArea h1, body.light-theme #responseArea h2, body.light-theme #responseArea h3 {
+            border-bottom: 1px solid rgba(0, 123, 255, 0.2);
+        }
+
         #responseArea h1 { font-size: 1.8em; }
         #responseArea h2 { font-size: 1.5em; }
         #responseArea h3 { font-size: 1.3em; }
@@ -182,11 +234,15 @@
         #responseArea strong {
             color: var(--primary-glow);
             font-weight: 600;
+            transition: color 0.5s ease;
         }
 
         #responseArea em {
-            color: #a0a0ff;
+            color: #a0a0ff; /* This color might remain static or be adjusted for light theme */
             font-style: italic;
+        }
+        body.light-theme #responseArea em {
+            color: #6a6aff; /* Lighter purple for emphasis in light theme */
         }
 
         #responseArea ul, #responseArea ol {
@@ -201,8 +257,8 @@
             background-color: var(--code-bg);
             border: 1px solid var(--code-border);
             border-left: 5px solid var(--primary-glow-darker);
-            padding: 15px 20px; /* More padding */
-            border-radius: 8px; /* Slightly more rounded */
+            padding: 15px 20px;
+            border-radius: 8px;
             overflow-x: auto;
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -210,16 +266,21 @@
             font-size: 0.9em;
             line-height: 1.5;
             margin: 1.5em 0;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5); /* Inner shadow for code blocks */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.5s ease, border-color 0.5s ease;
         }
         #responseArea code {
             font-family: 'Consolas', 'Monaco', monospace;
             background-color: rgba(255, 255, 255, 0.1);
             padding: 2px 5px;
             border-radius: 4px;
+            transition: background-color 0.5s ease;
+        }
+        body.light-theme #responseArea code {
+            background-color: rgba(0, 0, 0, 0.05);
         }
         #responseArea pre code {
-            background-color: transparent; /* Don't double highlight in pre */
+            background-color: transparent;
             padding: 0;
         }
 
@@ -227,19 +288,24 @@
         #responseArea::-webkit-scrollbar {
             width: 8px;
         }
-
         #responseArea::-webkit-scrollbar-track {
             background: #282828;
             border-radius: 10px;
         }
-
+        body.light-theme #responseArea::-webkit-scrollbar-track {
+            background: #e0e0e5;
+        }
         #responseArea::-webkit-scrollbar-thumb {
             background-color: var(--primary-glow);
             border-radius: 10px;
             border: 2px solid #282828;
             box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+            transition: background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
         }
-
+        body.light-theme #responseArea::-webkit-scrollbar-thumb {
+            border: 2px solid #e0e0e5;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
         #responseArea::-webkit-scrollbar-thumb:hover {
             background-color: var(--primary-glow-darker);
         }
@@ -248,6 +314,9 @@
         #responseArea {
             scrollbar-width: thin;
             scrollbar-color: var(--primary-glow) #282828;
+        }
+        body.light-theme #responseArea {
+            scrollbar-color: var(--primary-glow) #e0e0e5;
         }
 
 
@@ -261,6 +330,7 @@
             margin: 0 2px;
             animation: bounce 1.4s infinite ease-in-out both;
             box-shadow: 0 0 5px var(--primary-glow);
+            transition: background-color 0.5s ease, box-shadow 0.5s ease;
         }
         .loading-dot:nth-child(1) { animation-delay: -0.32s; }
         .loading-dot:nth-child(2) { animation-delay: -0.16s; }
@@ -268,20 +338,179 @@
 
         @keyframes bounce {
             0%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); } /* Slightly higher bounce */
+            40% { transform: translateY(-10px); }
         }
 
         /* Error message style */
         .error-message {
-            color: #ff6666; /* Redder tone for errors */
+            color: var(--error-color);
             font-weight: 500;
+            transition: color 0.5s ease;
         }
+
+        /* --- API Key Modal --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .api-key-modal-content {
+            background-color: var(--modal-bg-color);
+            border: 1px solid var(--modal-border-color);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.05);
+            text-align: center;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+        }
+        .modal-overlay.visible .api-key-modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .api-key-modal-content h2 {
+            color: var(--primary-glow);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 1.6em;
+            transition: color 0.5s ease;
+        }
+        .api-key-modal-content p {
+            font-size: 0.95em;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .api-key-modal-input {
+            width: calc(100% - 24px); /* Account for padding */
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--response-border);
+            border-radius: 8px;
+            background-color: var(--code-bg);
+            color: var(--text-light);
+            font-size: 1em;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, background-color 0.5s ease, color 0.5s ease;
+        }
+        .api-key-modal-input:focus {
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+        }
+        body.light-theme .api-key-modal-input:focus {
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .modal-button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .modal-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+        }
+        .modal-button.primary {
+            background-color: var(--primary-glow);
+            color: var(--bg-dark); /* Dark text on glow button */
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        body.light-theme .modal-button.primary {
+            background-color: var(--primary-glow);
+            color: white;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+        }
+        .modal-button.primary:hover {
+            background-color: var(--primary-glow-darker);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.7);
+        }
+        body.light-theme .modal-button.primary:hover {
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.5);
+        }
+        .modal-button.secondary {
+            background-color: transparent;
+            color: var(--text-medium);
+            border: 1px solid var(--text-medium);
+        }
+        .modal-button.secondary:hover {
+            color: var(--text-light);
+            border-color: var(--text-light);
+            transform: translateY(-2px);
+        }
+
+        /* --- API Key Management Link --- */
+        #apiKeyLink {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: var(--link-color);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: color 0.3s ease, opacity 0.3s ease;
+        }
+        #apiKeyLink:hover {
+            opacity: 1;
+            color: var(--primary-glow-darker);
+            text-decoration: underline;
+        }
+
+        /* --- Theme Toggle Button --- */
+        #themeToggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            cursor: pointer;
+            color: var(--button-icon-color);
+            transition: color 0.3s ease, transform 0.3s ease;
+            outline: none;
+            z-index: 100;
+        }
+        #themeToggle:hover {
+            color: var(--primary-glow);
+            transform: rotate(20deg) scale(1.1);
+        }
+        #themeToggle:active {
+            transform: scale(0.95);
+        }
+
     </style>
 </head>
 <body>
 
     <!-- Google Generative AI JavaScript SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.1/dist/index.min.js"></script>
+
+    <button id="themeToggle" aria-label="Toggle theme">
+        <!-- Sun icon for light theme, Moon for dark theme -->
+        <span class="icon-dark">🌙</span>
+        <span class="icon-light" style="display: none;">☀️</span>
+    </button>
 
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="Ask Gemini something..." autofocus autocomplete="off">
@@ -294,39 +523,101 @@
         <p>If you encounter issues, try refreshing and re-entering your key, or check your browser's console (F12).</p>
     </div>
 
+    <a href="#" id="apiKeyLink">Manage API Key</a>
+
+    <!-- API Key Modal -->
+    <div id="apiKeyModal" class="modal-overlay">
+        <div class="api-key-modal-content">
+            <h2>Enter Your Gemini API Key</h2>
+            <p>To interact with Gemini AI, please provide your API key. You can generate one from <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--link-color);">Google AI Studio</a>.</p>
+            <input type="text" id="apiKeyInput" class="api-key-modal-input" placeholder="Paste your API key here..." autocomplete="off">
+            <div class="modal-button-group">
+                <button id="saveApiKeyButton" class="modal-button primary">Save Key</button>
+                <button id="cancelApiKeyButton" class="modal-button secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const searchInput = document.getElementById('searchInput');
         const sendButton = document.getElementById('sendButton');
         const responseArea = document.getElementById('responseArea');
+        const apiKeyLink = document.getElementById('apiKeyLink');
+        const themeToggle = document.getElementById('themeToggle');
+        const iconDark = themeToggle.querySelector('.icon-dark');
+        const iconLight = themeToggle.querySelector('.icon-light');
+
+        const apiKeyModal = document.getElementById('apiKeyModal');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const saveApiKeyButton = document.getElementById('saveApiKeyButton');
+        const cancelApiKeyButton = document.getElementById('cancelApiKeyButton');
+
         const API_KEY_STORAGE_KEY = 'geminiApiKey';
+        const THEME_STORAGE_KEY = 'userTheme';
 
         let geminiApiKey = localStorage.getItem(API_KEY_STORAGE_KEY);
         let genAI;
         let model;
 
-        // Function to prompt for API Key
-        function getApiKey() {
-            let key = prompt("Please enter your Google Gemini API Key. It will be stored securely in your browser's local storage.");
+        // --- Theme Toggle Logic ---
+        function applyTheme(theme) {
+            document.body.classList.toggle('light-theme', theme === 'light');
+            iconDark.style.display = theme === 'dark' ? 'inline' : 'none';
+            iconLight.style.display = theme === 'light' ? 'inline' : 'none';
+            localStorage.setItem(THEME_STORAGE_KEY, theme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        }
+
+        // --- API Key Modal Logic ---
+        function showApiKeyModal() {
+            apiKeyModal.classList.add('visible');
+            apiKeyInput.value = geminiApiKey || ''; // Pre-fill if exists
+            apiKeyInput.focus();
+        }
+
+        function hideApiKeyModal() {
+            apiKeyModal.classList.remove('visible');
+        }
+
+        // Function to handle API Key input
+        function handleApiKeyInput() {
+            const key = apiKeyInput.value.trim();
             if (key) {
                 localStorage.setItem(API_KEY_STORAGE_KEY, key);
                 geminiApiKey = key;
+                hideApiKeyModal();
                 initializeGemini();
             } else {
-                responseArea.innerHTML = '<p class="error-message">API Key is required to use Gemini AI. Please refresh the page to enter it.</p>';
-                sendButton.disabled = true;
-                searchInput.disabled = true;
-                searchInput.placeholder = "API Key required...";
+                alert("API Key cannot be empty!"); // Simple validation
             }
         }
 
         // Initialize Gemini AI
-        function initializeGemini() {
+        async function initializeGemini() {
             if (geminiApiKey) {
                 try {
-                    // Check if window.GoogleGenerativeAI is actually available
                     if (typeof window.GoogleGenerativeAI !== 'function') {
-                        throw new Error("Google Generative AI SDK not loaded. Check your internet connection or browser extensions.");
+                        // Wait for the SDK to load if it's not immediately available
+                        await new Promise(resolve => {
+                            const script = document.createElement('script');
+                            script.src = "https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.1/dist/index.min.js";
+                            script.onload = resolve;
+                            script.onerror = () => {
+                                console.error("Failed to load Gemini AI SDK script.");
+                                throw new Error("Google Generative AI SDK script failed to load.");
+                            };
+                            document.head.appendChild(script);
+                        });
+                        if (typeof window.GoogleGenerativeAI !== 'function') {
+                            throw new Error("Google Generative AI SDK not loaded after attempt. Check internet/extensions.");
+                        }
                     }
+
                     genAI = new window.GoogleGenerativeAI(geminiApiKey);
                     model = genAI.getGenerativeModel({ model: "gemini-pro" });
                     console.log("Gemini AI model initialized successfully.");
@@ -335,13 +626,28 @@
                     searchInput.placeholder = "Ask Gemini something...";
                 } catch (error) {
                     console.error("Failed to initialize Gemini AI:", error);
-                    responseArea.innerHTML = `<p class="error-message">Failed to initialize Gemini AI. Error: ${error.message}. Please ensure the SDK loaded correctly and your API key is valid.</p>`;
+                    let errorMessage = `Failed to initialize Gemini AI. Error: ${error.message}.`;
+                    if (error.message.includes('SDK not loaded')) {
+                         errorMessage += " Please check your internet connection or browser extensions (e.g., ad-blockers) that might block external scripts.";
+                    } else if (error.message.includes('API_KEY_INVALID')) {
+                        errorMessage += " Your API key seems invalid. Please click 'Manage API Key' to re-enter it.";
+                        localStorage.removeItem(API_KEY_STORAGE_KEY);
+                        geminiApiKey = null;
+                    }
+                    responseArea.innerHTML = `<p class="error-message">${errorMessage}</p>`;
                     sendButton.disabled = true;
                     searchInput.disabled = true;
                     searchInput.placeholder = "Initialization failed.";
+                    // If API key is invalid or missing, show modal again
+                    if (!geminiApiKey || error.message.includes('API_KEY_INVALID')) {
+                         showApiKeyModal();
+                    }
                 }
             } else {
-                getApiKey(); // Prompt if key is not found
+                showApiKeyModal(); // Show modal if key is not found
+                sendButton.disabled = true;
+                searchInput.disabled = true;
+                searchInput.placeholder = "API Key required...";
             }
         }
 
@@ -367,9 +673,7 @@
                 .replace(/^\d+\. (.*$)/gim, '<li>$1</li>'); // Ordered list items (simple)
 
             // Wrap list items in ul/ol if found, but avoid wrapping everything
-            // This is a simple wrapper and might not handle complex nested lists perfectly
             if (html.includes('<li>') && !html.includes('<ul>') && !html.includes('<ol>')) {
-                // Determine list type based on first list item if mixed, default to ul
                 const isOrdered = html.match(/^<li>\d+\./m);
                 const listTag = isOrdered ? 'ol' : 'ul';
                 html = `<${listTag}>${html}</${listTag}>`;
@@ -385,15 +689,8 @@
             // Replace multiple <br> tags with just one, except after block elements
             html = html.replace(/(<br>\s*){2,}/g, '<br><br>');
 
-
-            // Ensure paragraphs are wrapped (simplified, handles basic cases)
-            // This is tricky without a full parser, so we mostly rely on <br><br>
-            // A more robust solution would be to split by \n\n and wrap in <p>
-            // but that's harder with existing regexes. For now, rely on line breaks.
-
             return html;
         }
-
 
         // Send message to Gemini
         async function sendMessage() {
@@ -401,11 +698,12 @@
             if (!promptText) return;
 
             if (!geminiApiKey) {
-                responseArea.innerHTML = '<p class="error-message">No Gemini API Key found. Please refresh the page to enter it.</p>';
+                responseArea.innerHTML = '<p class="error-message">No Gemini API Key found. Please click "Manage API Key" below to enter it.</p>';
+                showApiKeyModal();
                 return;
             }
             if (!model) {
-                responseArea.innerHTML = '<p class="error-message">Gemini model not initialized. Please refresh.</p>';
+                responseArea.innerHTML = '<p class="error-message">Gemini model not initialized. Please refresh the page or re-enter your API key.</p>';
                 return;
             }
 
@@ -416,7 +714,6 @@
 
             responseArea.classList.remove('visible'); // Hide old response instantly for a fresh animation
             responseArea.innerHTML = `<p>Thinking<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></p>`;
-            // Show loading state, then content animates in after fetch
             responseArea.classList.add('visible');
             responseArea.scrollTop = responseArea.scrollHeight; // Scroll to loading dots
 
@@ -429,36 +726,57 @@
                 console.error("Error calling Gemini AI:", error);
                 let errorMessage = `Error: ${error.message}.`;
                 if (error.message.includes('API key not valid') || error.message.includes('API_KEY_INVALID')) {
-                    errorMessage = "Your API key seems invalid. Please refresh the page to re-enter it.";
-                    localStorage.removeItem(API_KEY_STORAGE_KEY); // Remove invalid key
-                    geminiApiKey = null; // Clear in memory
+                    errorMessage = "Your API key seems invalid. Please click 'Manage API Key' to re-enter it.";
+                    localStorage.removeItem(API_KEY_STORAGE_KEY);
+                    geminiApiKey = null;
+                    showApiKeyModal();
                 } else if (error.message.includes('Quota exceeded')) {
                     errorMessage = "You might have exceeded your Gemini API quota. Please check your Google Cloud Console.";
                 } else if (error.message.includes('undefined is not a constructor')) {
-                    errorMessage = "Gemini SDK failed to load. Check internet, ad-blockers, or browser console.";
+                    errorMessage = "Gemini SDK failed to load. Check internet, ad-blockers, or browser console (F12).";
+                } else {
+                     errorMessage = "An unexpected error occurred. Please try again later. Check browser console for details.";
                 }
                 responseArea.innerHTML = `<p class="error-message">${errorMessage}</p>`;
             } finally {
                 sendButton.disabled = false;
                 searchInput.disabled = false;
-                searchInput.focus(); // Keep focus on search bar
+                searchInput.focus();
                 searchInput.placeholder = "Ask Gemini something...";
-                responseArea.classList.add('visible'); // Ensure response is visible
+                responseArea.classList.add('visible');
                 responseArea.scrollTop = responseArea.scrollHeight; // Auto-scroll to bottom of response
             }
         }
 
-        // Event Listeners
+        // --- Event Listeners ---
         sendButton.addEventListener('click', sendMessage);
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
+        apiKeyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showApiKeyModal();
+        });
+        saveApiKeyButton.addEventListener('click', handleApiKeyInput);
+        cancelApiKeyButton.addEventListener('click', hideApiKeyModal);
+        // Close modal if overlay is clicked
+        apiKeyModal.addEventListener('click', (e) => {
+            if (e.target === apiKeyModal) {
+                hideApiKeyModal();
+            }
+        });
+        themeToggle.addEventListener('click', toggleTheme);
 
-        // Initialize on page load
+
+        // --- Initialize on page load ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Give a tiny delay before prompting for API key to ensure UI renders
+            // Apply saved theme or default to dark
+            const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
+            applyTheme(savedTheme);
+
+            // Give a tiny delay before initializing Gemini to ensure UI renders
             setTimeout(() => {
                 initializeGemini();
             }, 100);
@@ -466,7 +784,7 @@
             // Show initial message slightly after load for a smooth entry
             setTimeout(() => {
                 responseArea.classList.add('visible');
-            }, 200); // Slightly delay to make it more noticeable
+            }, 200);
         });
     </script>
 </body>
