@@ -31,6 +31,7 @@
             --suggestion-bg: #222;
             --suggestion-hover-bg: #333;
             --typing-cursor: var(--primary-glow);
+            --placeholder-color: var(--text-medium);
         }
 
         /* Light Theme overrides */
@@ -55,6 +56,7 @@
             --suggestion-bg: #f8f8f8;
             --suggestion-hover-bg: #e0e0e5;
             --typing-cursor: var(--primary-glow-darker);
+            --placeholder-color: #999;
         }
 
         /* Basic Reset & Body Styling */
@@ -113,7 +115,7 @@
         }
 
         #searchInput::placeholder {
-            color: var(--text-medium);
+            color: var(--placeholder-color);
             opacity: 0.7;
         }
 
@@ -288,7 +290,7 @@
             transform: translateY(0);
         }
 
-        #responseArea p, #responseArea ul, #responseArea ol, #responseArea h1, #responseArea h2, #responseArea h3, #responseArea div.code-block {
+        #responseArea p, #responseArea ul, #responseArea ol, #responseArea h1, #responseArea h2, #responseArea h3, #responseArea div.code-block, #responseArea blockquote {
             margin: 0 0 1em 0;
             padding: 0;
         }
@@ -343,6 +345,21 @@
             text-decoration: underline;
         }
 
+        #responseArea blockquote {
+            margin: 1em 0;
+            padding: 10px 20px;
+            border-left: 4px solid var(--primary-glow-darker);
+            background-color: rgba(0, 255, 255, 0.05); /* Light glow background */
+            border-radius: 4px;
+            color: var(--text-light);
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+        }
+        body.light-theme #responseArea blockquote {
+            background-color: rgba(0, 123, 255, 0.05);
+            border-left-color: var(--primary-glow-darker);
+        }
+
+
         /* Code block container */
         .code-block {
             position: relative;
@@ -396,7 +413,7 @@
         }
         body.light-theme .copy-code-button {
             background-color: rgba(255, 255, 255, 0.7);
-            color: var(--text-light);
+            color: var(--text-medium); /* Darker text for light theme */
             border: 1px solid var(--response-border);
         }
         .copy-code-button:hover {
@@ -649,6 +666,7 @@
 <body>
 
     <!-- Google Generative AI JavaScript SDK -->
+    <!-- The SDK is now dynamically loaded in JS if not found, making this tag somewhat redundant but harmless -->
     <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.1/dist/index.min.js"></script>
 
     <button id="themeToggle" aria-label="Toggle theme">
@@ -658,7 +676,7 @@
     </button>
 
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Ask Gemini something..." aria-label="Search or ask Gemini" autofocus autocomplete="off">
+        <input type="text" id="searchInput" placeholder="Ask Gemini something..." aria-label="Search or ask Gemini" autofocus autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" aria-expanded="false">
         <div class="input-buttons">
             <button id="clearInputButton" class="material-symbols-outlined" aria-label="Clear input">close</button>
             <button id="voiceSearchButton" class="material-symbols-outlined" aria-label="Voice search">mic</button>
@@ -667,7 +685,7 @@
         <ul id="suggestions" role="listbox" aria-label="Search suggestions"></ul>
     </div>
 
-    <div id="responseArea" role="region" aria-live="polite">
+    <div id="responseArea" role="region" aria-live="polite" aria-atomic="false">
         <p>Your journey with Gemini AI begins here. Type a question above and press Enter or the <span class="material-symbols-outlined" style="font-size: 0.9em; vertical-align: middle; color: var(--primary-glow);">play_arrow</span> button.</p>
         <p>Your API Key will be securely stored in your browser's local storage for convenience.</p>
         <p>You can ask follow-up questions, as Gemini now remembers the conversation context!</p>
@@ -700,6 +718,7 @@
         const iconDark = themeToggle.querySelector('.icon-dark');
         const iconLight = themeToggle.querySelector('.icon-light');
         const suggestionsList = document.getElementById('suggestions');
+        const searchContainer = document.querySelector('.search-container'); // Added for click outside suggestions
 
         const apiKeyModal = document.getElementById('apiKeyModal');
         const apiKeyInput = document.getElementById('apiKeyInput');
@@ -745,6 +764,7 @@
 
         function hideApiKeyModal() {
             apiKeyModal.classList.remove('visible');
+            searchInput.focus(); // Return focus to search input after closing modal
         }
 
         function handleApiKeyInput() {
@@ -753,7 +773,7 @@
                 localStorage.setItem(API_KEY_STORAGE_KEY, key);
                 geminiApiKey = key;
                 hideApiKeyModal();
-                initializeGemini();
+                initializeGemini(); // Attempt to re-initialize Gemini with the new key
             } else {
                 alert("API Key cannot be empty!");
             }
@@ -765,22 +785,25 @@
                 try {
                     // Check if SDK is already loaded or load it
                     if (typeof window.GoogleGenerativeAI === 'undefined') {
-                        console.log("Loading Gemini AI SDK script...");
+                        console.log("Loading Gemini AI SDK script dynamically...");
                         await new Promise((resolve, reject) => {
                             const script = document.createElement('script');
                             script.src = "https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.1/dist/index.min.js";
-                            script.onload = resolve;
-                            script.onerror = () => reject(new Error("Google Generative AI SDK script failed to load."));
+                            script.onload = () => {
+                                if (typeof window.GoogleGenerativeAI !== 'undefined') {
+                                    resolve();
+                                } else {
+                                    reject(new Error("Google Generative AI SDK did not become available after loading."));
+                                }
+                            };
+                            script.onerror = () => reject(new Error("Google Generative AI SDK script failed to load. Check internet connection."));
                             document.head.appendChild(script);
                         });
-                        if (typeof window.GoogleGenerativeAI === 'undefined') {
-                            throw new Error("Google Generative AI SDK not loaded after attempt. Check internet/extensions.");
-                        }
                     }
 
                     genAI = new window.GoogleGenerativeAI(geminiApiKey);
                     model = genAI.getGenerativeModel({ model: "gemini-pro" });
-                    chatSession = model.startChat({ history: [] }); // Initialize chat session
+                    chatSession = model.startChat({ history: [] }); // Initialize chat session for conversation
                     console.log("Gemini AI model and chat session initialized successfully.");
                     sendButton.disabled = false;
                     searchInput.disabled = false;
@@ -789,7 +812,7 @@
                 } catch (error) {
                     console.error("Failed to initialize Gemini AI:", error);
                     let errorMessage = `Failed to initialize Gemini AI: ${error.message}.`;
-                    if (error.message.includes('SDK not loaded')) {
+                    if (error.message.includes('SDK not loaded') || error.message.includes('did not become available')) {
                         errorMessage += " Please check your internet connection or browser extensions (e.g., ad-blockers) that might block external scripts.";
                     } else if (error.message.includes('API_KEY_INVALID') || error.message.includes('401')) { // 401 is common for invalid key
                         errorMessage = "Your API key seems invalid or unauthorized. Please click 'Manage API Key' to re-enter it.";
@@ -799,11 +822,11 @@
                     } else if (error.message.includes('500') || error.message.includes('internal error')) {
                          errorMessage = "An internal server error occurred with Gemini. Please try again later.";
                     }
-                    displayResponse(`<p class="error-message">${errorMessage}</p>`);
+                    displayResponse(`<p class="error-message">${errorMessage}</p>`, false); // Don't animate error
                     sendButton.disabled = true;
                     searchInput.disabled = true;
                     searchInput.placeholder = "Initialization failed.";
-                    if (!geminiApiKey) showApiKeyModal();
+                    if (!geminiApiKey) showApiKeyModal(); // If still no key, show modal
                 }
             } else {
                 showApiKeyModal(); // Show modal if key is not found on load
@@ -813,82 +836,138 @@
             }
         }
 
-        // --- Markdown to HTML Conversion (More Robust) ---
+        // --- Markdown to HTML Conversion ---
         function formatMarkdown(markdownText) {
-            // Using a simple regex-based parser. For complex markdown,
-            // consider a library like `marked.js` or `showdown.js`.
             let html = markdownText || '';
 
             // Ensure consistent newlines for processing
             html = html.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
-            // Handle code blocks (must be first to prevent other regexes from messing with it)
+            // --- Block-level elements (process first to avoid issues with inline elements) ---
+
+            // Handle code blocks (must be first, and handle multiline code safely)
             html = html.replace(/```(\w*)\n([\s\S]*?)```/gm, (match, lang, code) => {
                 const languageClass = lang ? `language-${lang.toLowerCase()}` : '';
                 return `<div class="code-block"><button class="copy-code-button">Copy</button><pre><code class="${languageClass}">${escapeHtml(code.trim())}</code></pre></div>`;
             });
 
-            // Handle inline code
-            html = html.replace(/`([^`]+)`/g, (match, code) => `<code>${escapeHtml(code)}</code>`);
-
             // Blockquotes
-            html = html.replace(/^> (.*$)/gim, '<blockquote><p>$1</p></blockquote>');
+            html = html.replace(/^> (.*$)/gim, (match, content) => `<blockquote><p>${content}</p></blockquote>`);
 
             // Headings
             html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
             html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
             html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
 
-            // Bold and Italic (order matters)
-            html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
-            html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
-
-            // Lists - Split into lines, process lists, then join back for paragraphs
+            // Lists - Process line by line to correctly handle nested lists (simple nesting) and paragraphs between lists
             const lines = html.split('\n');
             let processedLines = [];
             let inList = false;
             let listType = ''; // 'ul' or 'ol'
+            let indentLevel = 0; // For simple nested lists
 
-            lines.forEach(line => {
-                const ulMatch = line.match(/^[*-] (.*)/);
-                const olMatch = line.match(/^(\d+)\. (.*)/);
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                const ulMatch = line.match(/^(\s*)[*-] (.*)/);
+                const olMatch = line.match(/^(\s*)(\d+)\. (.*)/);
 
-                if (ulMatch) {
-                    if (!inList || listType !== 'ul') {
-                        if (inList) processedLines.push(`</${listType}>`);
-                        processedLines.push('<ul>');
+                if (ulMatch || olMatch) {
+                    const currentIndent = ulMatch ? ulMatch[1].length : olMatch[1].length;
+                    const currentListType = ulMatch ? 'ul' : 'ol';
+                    const listItemContent = ulMatch ? ulMatch[2].trim() : olMatch[3].trim();
+
+                    if (!inList) {
+                        // Start new list
+                        processedLines.push(`<${currentListType}>`);
                         inList = true;
-                        listType = 'ul';
+                        listType = currentListType;
+                        indentLevel = currentIndent;
+                    } else if (currentListType !== listType || currentIndent > indentLevel) {
+                        // Handle (simple) nesting or type change
+                        if (currentIndent > indentLevel) { // Nested list
+                            processedLines.push(`<${currentListType}>`);
+                            indentLevel = currentIndent;
+                            listType = currentListType; // Update type for inner list
+                        } else if (currentListType !== listType) { // List type changed at same level
+                            processedLines.push(`</${listType}><${currentListType}>`);
+                            listType = currentListType;
+                            indentLevel = currentIndent;
+                        } else if (currentIndent < indentLevel) { // De-nesting
+                             while (currentIndent < indentLevel && processedLines.length > 0) {
+                                let lastTag = processedLines[processedLines.length - 1];
+                                if (lastTag.startsWith('</ul') || lastTag.startsWith('</ol')) {
+                                    processedLines.pop(); // Remove closing tag
+                                }
+                                processedLines.push(`</${listType}>`);
+                                indentLevel -= 2; // Assuming 2 spaces per indent
+                             }
+                             // Now ensure current list type matches again
+                             if (currentListType !== listType) {
+                                processedLines.push(`</${listType}><${currentListType}>`);
+                                listType = currentListType;
+                             }
+                             indentLevel = currentIndent; // Update indent after de-nesting
+                        }
+                    } else if (currentIndent < indentLevel) {
+                         // This is a more complex de-nesting case; for simplicity, we'll close and reopen.
+                         // A more robust parser would track a stack of lists.
+                         while (indentLevel > currentIndent) {
+                            processedLines.push(`</${listType}>`);
+                            indentLevel -= 2; // Assume 2 spaces per indent
+                         }
+                         if (currentListType !== listType) {
+                            processedLines.push(`</${listType}><${currentListType}>`);
+                            listType = currentListType;
+                         }
                     }
-                    processedLines.push(`<li>${ulMatch[1].trim()}</li>`);
-                } else if (olMatch) {
-                    if (!inList || listType !== 'ol') {
-                        if (inList) processedLines.push(`</${listType}>`);
-                        processedLines.push('<ol>');
-                        inList = true;
-                        listType = 'ol';
-                    }
-                    processedLines.push(`<li>${olMatch[2].trim()}</li>`);
+                    processedLines.push(`<li>${listItemContent}</li>`);
                 } else {
                     if (inList) {
-                        processedLines.push(`</${listType}>`);
+                        // Close any open lists
+                        while (indentLevel >= 0 && processedLines.length > 0) {
+                            let lastTag = processedLines[processedLines.length - 1];
+                            if (lastTag.startsWith('</ul') || lastTag.startsWith('</ol')) {
+                                processedLines.pop(); // Remove redundant closing tags
+                            }
+                            processedLines.push(`</${listType}>`);
+                            indentLevel -= 2; // Adjust for next potential list
+                            if (indentLevel < 0) break; // Ensure we don't go below 0
+                        }
                         inList = false;
+                        listType = '';
+                        indentLevel = 0;
                     }
+
                     // Handle paragraphs, but not empty lines or lines already processed as blocks
-                    if (line.trim() !== '' && !line.startsWith('<h') && !line.startsWith('<blockquote>') && !line.startsWith('<div class="code-block">')) {
+                    if (line.trim() !== '' &&
+                        !line.startsWith('<h') && !line.startsWith('<blockquote>') && !line.startsWith('<div class="code-block">')) {
                         processedLines.push(`<p>${line.trim()}</p>`);
                     } else if (line.trim() !== '') {
                         processedLines.push(line); // Preserve already processed block elements
                     }
                 }
-            });
-            if (inList) processedLines.push(`</${listType}>`);
+            }
+            if (inList) processedLines.push(`</${listType}>`); // Close any remaining open lists
+
             html = processedLines.join('\n');
+
+            // --- Inline elements ---
+
+            // Inline code (must be before strong/em to prevent `**code**` from becoming bold code)
+            html = html.replace(/`([^`]+)`/g, (match, code) => `<code>${escapeHtml(code)}</code>`);
+
+            // Bold and Italic (order matters: bold then italic)
+            html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+            html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+
+            // Links (basic Markdown links)
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
 
             // Remove empty paragraph tags (can result from markdown processing)
             html = html.replace(/<p>\s*<\/p>/g, '');
 
-            // Convert remaining newlines that aren't inside block elements to <br> for spacing
+            // Convert remaining isolated newlines not inside block elements to <br> for spacing
             // This is a rough heuristic; a full markdown parser would handle this better.
             html = html.replace(/([^\n])\n(?![<])/g, '$1<br>');
 
@@ -907,11 +986,27 @@
 
 
         // --- Response Display & Typing Animation ---
-        async function displayResponse(fullHtmlContent) {
+        async function displayResponse(fullContent, animate = true) {
             responseArea.innerHTML = ''; // Clear previous content
             responseArea.classList.add('visible');
+            const placeholderContent = `<p>Your journey with Gemini AI begins here. Type a question above and press Enter or the <span class="material-symbols-outlined" style="font-size: 0.9em; vertical-align: middle; color: var(--primary-glow);">play_arrow</span> button.</p><p>Your API Key will be securely stored in your browser's local storage for convenience.</p><p>You can ask follow-up questions, as Gemini now remembers the conversation context!</p>`;
+
+
+            if (!fullContent) {
+                responseArea.innerHTML = placeholderContent;
+                return;
+            }
+
+            if (!animate) {
+                responseArea.innerHTML = fullContent;
+                addCopyCodeButtons();
+                scrollToBottom();
+                return;
+            }
+
             let currentContent = '';
-            const words = fullHtmlContent.split(/(\s+|(?=<[^>]*>))/); // Split by spaces or HTML tags
+            // Split by words, but also keep HTML tags intact for proper rendering
+            const words = fullContent.split(/(\s+|(?=<[^>]*>))/g);
 
             for (const word of words) {
                 currentContent += word;
@@ -921,7 +1016,7 @@
             }
 
             // Remove typing cursor after full content is displayed
-            responseArea.innerHTML = fullHtmlContent;
+            responseArea.innerHTML = fullContent;
             addCopyCodeButtons(); // Add copy buttons after the text is fully rendered
             scrollToBottom();
         }
@@ -953,14 +1048,19 @@
                 const button = codeBlock.querySelector('.copy-code-button');
                 const pre = codeBlock.querySelector('pre');
                 if (button && pre) {
-                    button.addEventListener('click', () => {
+                    // Remove existing event listener to prevent duplicates
+                    const oldButton = button.cloneNode(true);
+                    button.parentNode.replaceChild(oldButton, button);
+                    const newButton = oldButton;
+
+                    newButton.addEventListener('click', () => {
                         const code = pre.textContent;
                         navigator.clipboard.writeText(code).then(() => {
-                            button.textContent = 'Copied!';
-                            button.classList.add('copied');
+                            newButton.textContent = 'Copied!';
+                            newButton.classList.add('copied');
                             setTimeout(() => {
-                                button.textContent = 'Copy';
-                                button.classList.remove('copied');
+                                newButton.textContent = 'Copy';
+                                newButton.classList.remove('copied');
                             }, 2000);
                         }).catch(err => {
                             console.error('Failed to copy code: ', err);
@@ -977,12 +1077,12 @@
             if (!promptText || isGenerating) return;
 
             if (!geminiApiKey) {
-                displayResponse('<p class="error-message">No Gemini API Key found. Please click "Manage API Key" below to enter it.</p>');
+                displayResponse('<p class="error-message">No Gemini API Key found. Please click "Manage API Key" below to enter it.</p>', false);
                 showApiKeyModal();
                 return;
             }
             if (!chatSession) {
-                displayResponse('<p class="error-message">Gemini chat session not initialized. Please refresh the page or re-enter your API key.</p>');
+                displayResponse('<p class="error-message">Gemini chat session not initialized. Please refresh the page or re-enter your API key.</p>', false);
                 initializeGemini(); // Try to re-initialize
                 return;
             }
@@ -1014,8 +1114,10 @@
                     errorMessage = "An internal server error occurred with Gemini. Please try again later.";
                 } else if (error.message.includes('400') || error.message.includes('bad request')) {
                     errorMessage = "The request to Gemini was malformed. This might be due to content policy violations or an issue with the prompt.";
+                } else if (error.message.includes('blocked content')) {
+                    errorMessage = "The response was blocked due to content safety concerns. Please try rephrasing your query.";
                 }
-                displayResponse(`<p class="error-message">${errorMessage}</p>`);
+                displayResponse(`<p class="error-message">${errorMessage}</p>`, false); // Don't animate errors
             } finally {
                 setLoadingState(false);
             }
@@ -1033,7 +1135,17 @@
             "What are the benefits of exercise?",
             "Summarize the plot of Hamlet",
             "Write a Python function to sort a list",
-            "Describe the history of artificial intelligence"
+            "Describe the history of artificial intelligence",
+            "What are the best places to visit in Japan?",
+            "Explain the concept of blockchain technology.",
+            "Give me a recipe for homemade pizza.",
+            "Generate a list of unique baby names.",
+            "How do I start learning to code?",
+            "What is the difference between AI, ML, and Deep Learning?",
+            "Recommend some science fiction books.",
+            "Translate 'Hello, how are you?' into Spanish.",
+            "Write a short, inspiring quote.",
+            "What is the current time in New York?"
         ];
 
         function showSuggestions() {
@@ -1074,6 +1186,7 @@
             suggestionsList.classList.remove('visible');
             suggestionsList.innerHTML = '';
             searchInput.setAttribute('aria-expanded', 'false');
+            searchInput.removeAttribute('aria-activedescendant'); // Clear active descendant
         }
 
         let debounceTimeout;
@@ -1130,11 +1243,23 @@
                 items[suggestionIndex].classList.add('active');
                 items[suggestionIndex].setAttribute('aria-selected', 'true');
                 searchInput.setAttribute('aria-activedescendant', `suggestion-${suggestionIndex}`);
-                suggestionsList.scrollTop = items[suggestionIndex].offsetTop - suggestionsList.offsetTop - suggestionsList.clientHeight / 2;
+                // Scroll to make the selected item visible
+                const itemRect = items[suggestionIndex].getBoundingClientRect();
+                const listRect = suggestionsList.getBoundingClientRect();
+                if (itemRect.bottom > listRect.bottom) {
+                    suggestionsList.scrollTop += itemRect.bottom - listRect.bottom;
+                } else if (itemRect.top < listRect.top) {
+                    suggestionsList.scrollTop -= listRect.top - itemRect.top;
+                }
             } else {
                  searchInput.removeAttribute('aria-activedescendant');
             }
-            searchInput.value = suggestionIndex !== -1 ? currentSuggestions[suggestionIndex] : searchInput.value;
+            // Update input value only when navigating suggestions, not just on focus
+            // if (suggestionIndex !== -1) {
+            //     searchInput.value = currentSuggestions[suggestionIndex];
+            // }
+            // Decided against auto-filling input with suggestion on arrow key to avoid disrupting user's original query.
+            // User can press Enter to select.
         }
 
         // Close suggestions if clicked outside
@@ -1147,6 +1272,7 @@
 
         // --- Voice Search Logic ---
         function initializeVoiceSearch() {
+            // Check for webkitSpeechRecognition for broader browser support for now
             if ('webkitSpeechRecognition' in window) {
                 speechRecognition = new webkitSpeechRecognition();
                 speechRecognition.continuous = false; // Listen for a single utterance
@@ -1175,7 +1301,15 @@
                         alert("Microphone access blocked. Please enable it in your browser settings.");
                     } else if (event.error === 'no-speech') {
                          searchInput.placeholder = "No speech detected. Try again?";
+                    } else if (event.error === 'network') {
+                        searchInput.placeholder = "Network error with voice recognition. Try again?";
                     }
+                     // Restore placeholder after a short delay
+                    setTimeout(() => {
+                        if (!isGenerating) {
+                            searchInput.placeholder = "Ask Gemini something...";
+                        }
+                    }, 3000);
                 };
 
                 speechRecognition.onend = () => {
@@ -1195,7 +1329,7 @@
                 });
             } else {
                 voiceSearchButton.style.display = 'none'; // Hide button if not supported
-                console.warn("Web Speech API not supported in this browser.");
+                console.warn("Web Speech API (webkitSpeechRecognition) not supported in this browser.");
             }
         }
 
@@ -1204,7 +1338,11 @@
         sendButton.addEventListener('click', sendMessage);
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                sendMessage();
+                if (suggestionsList.classList.contains('visible') && suggestionIndex !== -1) {
+                    // Handled by keydown already, but good to ensure
+                } else {
+                    sendMessage();
+                }
             }
         });
         clearInputButton.addEventListener('click', () => {
@@ -1247,9 +1385,10 @@
                 responseArea.classList.add('visible');
             }, 200);
 
-            // Set up ARIA live region for dynamic content
-            responseArea.setAttribute('aria-live', 'polite');
-            responseArea.setAttribute('aria-atomic', 'false');
+            // Update clear button visibility on load if input already has text (e.g., browser autofill)
+            if (searchInput.value.length > 0) {
+                clearInputButton.classList.add('visible');
+            }
         });
     </script>
 </body>
