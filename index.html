@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Glow Search</title>
+    <style>
+        /* Basic Reset & Body Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0d0d0d; /* Very dark background */
+            color: #e0e0e0; /* Light text color */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* Prevent scrollbars from initial layout */
+            transition: background-color 0.5s ease;
+        }
+
+        /* Container for the search bar and button */
+        .search-container {
+            display: flex;
+            align-items: center;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            margin-bottom: 30px; /* Space between search bar and response */
+        }
+
+        /* Glowing Search Input */
+        #searchInput {
+            flex-grow: 1; /* Allows input to take up available space */
+            padding: 18px 25px;
+            font-size: 1.2em;
+            border: 2px solid #00ffff; /* Cyan border */
+            border-radius: 30px; /* Rounded corners */
+            background-color: #1a1a1a; /* Darker input background */
+            color: #e0e0e0;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5); /* Initial subtle glow */
+            transition: all 0.3s ease-in-out;
+            outline: none; /* Remove default focus outline */
+            box-sizing: border-box; /* Include padding/border in element's total width/height */
+        }
+
+        #searchInput::placeholder {
+            color: #888;
+        }
+
+        #searchInput:focus {
+            border-color: #00e6e6; /* Slightly different color on focus */
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8), 0 0 50px rgba(0, 255, 255, 0.3); /* Stronger glow on focus */
+            background-color: #222;
+        }
+
+        /* Seamless Send Button */
+        #sendButton {
+            position: absolute;
+            right: 15px; /* Position inside the search bar */
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            color: #00ffff; /* Cyan color */
+            cursor: pointer;
+            padding: 0 10px;
+            line-height: 1;
+            transition: color 0.2s ease, transform 0.2s ease;
+            outline: none;
+            -webkit-appearance: none; /* Remove default button styles for some browsers */
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        #sendButton:hover {
+            color: #fff; /* White on hover */
+            transform: scale(1.1); /* Slightly enlarge on hover */
+        }
+
+        #sendButton:active {
+            transform: scale(0.95); /* Slightly shrink on click */
+        }
+
+        /* Response Area */
+        #responseArea {
+            width: 90%;
+            max-width: 600px;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 50vh; /* Max height to allow scrolling for long responses */
+            overflow-y: auto; /* Enable vertical scrolling */
+            word-wrap: break-word; /* Break long words */
+            text-align: left;
+            font-size: 1.1em;
+            line-height: 1.6;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            opacity: 0; /* Initially hidden */
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        #responseArea.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #responseArea p {
+            margin: 0 0 10px 0;
+        }
+
+        #responseArea strong {
+            color: #00ffff; /* Cyan for strong text */
+        }
+
+        #responseArea em {
+            color: #a0a0ff; /* Lighter purple for emphasis */
+        }
+
+        #responseArea pre {
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            border-left: 5px solid #00ffff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            overflow-x: auto; /* Horizontal scroll for code blocks */
+            white-space: pre-wrap; /* Wrap long lines in pre */
+            word-wrap: break-word;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            margin: 15px 0;
+        }
+
+        /* Basic loading indicator style */
+        .loading-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #00ffff;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+        .loading-dot:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Google Generative AI JavaScript SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.1/dist/index.min.js"></script>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Ask Gemini something..." autofocus>
+        <button id="sendButton">❯</button> <!-- Using a unicode right arrow for the send button -->
+    </div>
+
+    <div id="responseArea">
+        <p>Your Gemini AI responses will appear here.</p>
+        <p>To begin, type a question in the search bar and press Enter or click the send button.</p>
+        <p>If you need to re-enter your API key, clear your browser's local storage or refresh the page and decline the previous key.</p>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const sendButton = document.getElementById('sendButton');
+        const responseArea = document.getElementById('responseArea');
+        const API_KEY_STORAGE_KEY = 'geminiApiKey';
+
+        let geminiApiKey = localStorage.getItem(API_KEY_STORAGE_KEY);
+        let genAI;
+        let model;
+
+        // Function to prompt for API Key
+        function getApiKey() {
+            let key = prompt("Please enter your Google Gemini API Key. It will be stored in your browser's local storage.");
+            if (key) {
+                localStorage.setItem(API_KEY_STORAGE_KEY, key);
+                geminiApiKey = key;
+                initializeGemini();
+            } else {
+                responseArea.innerHTML = '<p style="color: red;">API Key is required to use Gemini AI. Please refresh the page to enter it.</p>';
+                sendButton.disabled = true;
+                searchInput.disabled = true;
+            }
+        }
+
+        // Initialize Gemini AI
+        function initializeGemini() {
+            if (geminiApiKey) {
+                try {
+                    genAI = new window.GoogleGenerativeAI(geminiApiKey);
+                    model = genAI.getGenerativeModel({ model: "gemini-pro" });
+                    console.log("Gemini AI model initialized successfully.");
+                    sendButton.disabled = false;
+                    searchInput.disabled = false;
+                } catch (error) {
+                    console.error("Failed to initialize Gemini AI:", error);
+                    responseArea.innerHTML = `<p style="color: red;">Failed to initialize Gemini AI. Error: ${error.message}. Please check your API key and refresh.</p>`;
+                    sendButton.disabled = true;
+                    searchInput.disabled = true;
+                }
+            } else {
+                getApiKey(); // Prompt if key is not found
+            }
+        }
+
+        // Format Markdown response to HTML
+        function formatMarkdown(markdownText) {
+            let html = markdownText
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>') // H3
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')   // H2
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')    // H1
+                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>') // Bold
+                .replace(/\*(.*?)\*/gim, '<em>$1</em>')     // Italic
+                .replace(/```([\s\S]*?)```/gim, '<pre>$1</pre>') // Code blocks
+                .replace(/`([^`]+)`/gim, '<code>$1</code>') // Inline code
+                .replace(/\n/g, '<br>'); // Newlines
+
+            // Simple list handling (can be more robust)
+            html = html.replace(/^\s*\*\s*(.*)/gim, '<li>$1</li>');
+            if (html.includes('<li>')) {
+                html = '<ul>' + html + '</ul>';
+            }
+
+            return html;
+        }
+
+        // Send message to Gemini
+        async function sendMessage() {
+            const promptText = searchInput.value.trim();
+            if (!promptText) return;
+
+            if (!geminiApiKey) {
+                responseArea.innerHTML = '<p style="color: red;">No Gemini API Key found. Please refresh the page to enter it.</p>';
+                return;
+            }
+            if (!model) {
+                responseArea.innerHTML = '<p style="color: red;">Gemini model not initialized. Please refresh.</p>';
+                return;
+            }
+
+            searchInput.value = ''; // Clear input
+            sendButton.disabled = true;
+            searchInput.disabled = true;
+            responseArea.classList.remove('visible'); // Hide old response
+            responseArea.innerHTML = `<p>Thinking<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></p>`;
+            responseArea.classList.add('visible'); // Show loading state
+
+            try {
+                const result = await model.generateContent(promptText);
+                const response = await result.response;
+                const text = response.text();
+                responseArea.innerHTML = formatMarkdown(text);
+            } catch (error) {
+                console.error("Error calling Gemini AI:", error);
+                let errorMessage = `Error: ${error.message}.`;
+                if (error.message.includes('API key not valid')) {
+                    errorMessage += " Your API key seems invalid. Please refresh the page to re-enter it.";
+                    localStorage.removeItem(API_KEY_STORAGE_KEY); // Remove invalid key
+                } else if (error.message.includes('Quota exceeded')) {
+                    errorMessage += " You might have exceeded your Gemini API quota. Please check your Google Cloud Console.";
+                } else {
+                    errorMessage += " Please try again later.";
+                }
+                responseArea.innerHTML = `<p style="color: red;">${errorMessage}</p>`;
+            } finally {
+                sendButton.disabled = false;
+                searchInput.disabled = false;
+                searchInput.focus(); // Keep focus on search bar
+                responseArea.classList.add('visible'); // Ensure response is visible
+            }
+        }
+
+        // Event Listeners
+        sendButton.addEventListener('click', sendMessage);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGemini();
+            // Show initial message slightly after load
+            setTimeout(() => {
+                responseArea.classList.add('visible');
+            }, 100);
+        });
+    </script>
+</body>
+</html>
