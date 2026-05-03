@@ -3,21 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Glow Search</title>
+    <title>Gemini Glow Search Pro</title>
+    <!-- Google Fonts - Poppins for a clean, modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* CSS Variables for easy color adjustments */
+        :root {
+            --bg-dark: #0a0a0d;
+            --bg-gradient-start: #100f1a;
+            --bg-gradient-end: #0a0a0d;
+            --primary-glow: #00ffff; /* Cyan */
+            --primary-glow-darker: #00e6e6;
+            --text-light: #e0e0e0;
+            --text-medium: #888;
+            --input-bg: #1a1a1a;
+            --response-bg: rgba(26, 26, 26, 0.8); /* Semi-transparent */
+            --response-border: #333;
+            --code-bg: #2a2a2a;
+            --code-border: #444;
+        }
+
         /* Basic Reset & Body Styling */
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0d0d0d; /* Very dark background */
-            color: #e0e0e0; /* Light text color */
+            font-family: 'Poppins', sans-serif; /* Use Poppins */
+            background: radial-gradient(circle at center, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            /* Optional: subtle noise texture */
+            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 0h3v3H0V0zm3 3h3v3H3V3z'/%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text-light);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden; /* Prevent scrollbars from initial layout */
+            overflow-x: hidden; /* Prevent horizontal scroll */
             transition: background-color 0.5s ease;
         }
 
@@ -28,79 +48,111 @@
             width: 90%;
             max-width: 600px;
             position: relative;
-            margin-bottom: 30px; /* Space between search bar and response */
+            margin-bottom: 30px;
+            z-index: 10; /* Ensure it's above other elements if needed */
         }
 
         /* Glowing Search Input */
         #searchInput {
-            flex-grow: 1; /* Allows input to take up available space */
+            flex-grow: 1;
             padding: 18px 25px;
-            font-size: 1.2em;
-            border: 2px solid #00ffff; /* Cyan border */
-            border-radius: 30px; /* Rounded corners */
-            background-color: #1a1a1a; /* Darker input background */
-            color: #e0e0e0;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5); /* Initial subtle glow */
+            font-size: 1.15em;
+            font-weight: 400;
+            border: 2px solid var(--primary-glow);
+            border-radius: 30px;
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            /* Layered box-shadow for deeper glow */
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.4),
+                        0 0 20px rgba(0, 255, 255, 0.2),
+                        inset 0 0 5px rgba(0, 255, 255, 0.1);
             transition: all 0.3s ease-in-out;
-            outline: none; /* Remove default focus outline */
-            box-sizing: border-box; /* Include padding/border in element's total width/height */
+            outline: none;
+            box-sizing: border-box;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.3); /* Subtle text glow */
+            animation: input-pulse 3s infinite alternate ease-in-out; /* Gentle pulse */
         }
 
         #searchInput::placeholder {
-            color: #888;
+            color: var(--text-medium);
+            opacity: 0.7;
         }
 
         #searchInput:focus {
-            border-color: #00e6e6; /* Slightly different color on focus */
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.8), 0 0 50px rgba(0, 255, 255, 0.3); /* Stronger glow on focus */
+            border-color: var(--primary-glow-darker);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8),
+                        0 0 40px rgba(0, 255, 255, 0.5),
+                        inset 0 0 10px rgba(0, 255, 255, 0.2);
             background-color: #222;
+            transform: scale(1.01); /* Slight zoom on focus */
+            animation: none; /* Stop pulse on focus */
+        }
+
+        /* Input pulse animation */
+        @keyframes input-pulse {
+            0% { box-shadow: 0 0 8px rgba(0, 255, 255, 0.4), 0 0 20px rgba(0, 255, 255, 0.2), inset 0 0 5px rgba(0, 255, 255, 0.1); }
+            100% { box-shadow: 0 0 12px rgba(0, 255, 255, 0.6), 0 0 25px rgba(0, 255, 255, 0.3), inset 0 0 7px rgba(0, 255, 255, 0.15); }
         }
 
         /* Seamless Send Button */
         #sendButton {
             position: absolute;
-            right: 15px; /* Position inside the search bar */
+            right: 15px;
             background: none;
             border: none;
-            font-size: 1.8em;
-            color: #00ffff; /* Cyan color */
+            font-size: 2em; /* Slightly larger */
+            color: var(--primary-glow);
             cursor: pointer;
             padding: 0 10px;
             line-height: 1;
-            transition: color 0.2s ease, transform 0.2s ease;
+            transition: color 0.2s ease, transform 0.2s ease, filter 0.2s ease;
             outline: none;
-            -webkit-appearance: none; /* Remove default button styles for some browsers */
+            -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
+            filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5)); /* Glow for the button symbol */
         }
 
         #sendButton:hover {
-            color: #fff; /* White on hover */
-            transform: scale(1.1); /* Slightly enlarge on hover */
+            color: var(--text-light);
+            transform: scale(1.15); /* More pronounced enlarge */
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
         }
 
         #sendButton:active {
-            transform: scale(0.95); /* Slightly shrink on click */
+            transform: scale(0.95);
+            filter: drop-shadow(0 0 2px rgba(0, 255, 255, 0.3));
         }
+
+        #sendButton:disabled {
+            color: #555;
+            cursor: not-allowed;
+            filter: drop-shadow(0 0 0px rgba(0, 255, 255, 0.0));
+        }
+
 
         /* Response Area */
         #responseArea {
             width: 90%;
             max-width: 600px;
-            background-color: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 10px;
-            padding: 20px;
-            max-height: 50vh; /* Max height to allow scrolling for long responses */
-            overflow-y: auto; /* Enable vertical scrolling */
-            word-wrap: break-word; /* Break long words */
+            background-color: var(--response-bg);
+            border: 1px solid var(--response-border);
+            border-radius: 12px; /* Slightly more rounded */
+            padding: 25px; /* More padding */
+            max-height: 55vh; /* Max height to allow scrolling for long responses */
+            overflow-y: auto;
+            word-wrap: break-word;
             text-align: left;
-            font-size: 1.1em;
+            font-size: 1em;
             line-height: 1.6;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            opacity: 0; /* Initially hidden */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.05); /* Deeper shadow */
+            opacity: 0;
             transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother transition */
+            z-index: 5; /* Below search bar */
+            /* Frosted glass effect (if supported) */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
 
         #responseArea.visible {
@@ -108,41 +160,107 @@
             transform: translateY(0);
         }
 
-        #responseArea p {
-            margin: 0 0 10px 0;
+        #responseArea p, #responseArea ul, #responseArea ol, #responseArea h1, #responseArea h2, #responseArea h3 {
+            margin: 0 0 1em 0; /* More consistent spacing */
+            padding: 0;
+        }
+        #responseArea p:last-child, #responseArea li:last-child {
+             margin-bottom: 0;
         }
 
+        #responseArea h1, #responseArea h2, #responseArea h3 {
+            color: var(--primary-glow);
+            font-weight: 600;
+            margin-top: 1.5em;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            padding-bottom: 0.5em;
+        }
+        #responseArea h1 { font-size: 1.8em; }
+        #responseArea h2 { font-size: 1.5em; }
+        #responseArea h3 { font-size: 1.3em; }
+
         #responseArea strong {
-            color: #00ffff; /* Cyan for strong text */
+            color: var(--primary-glow);
+            font-weight: 600;
         }
 
         #responseArea em {
-            color: #a0a0ff; /* Lighter purple for emphasis */
+            color: #a0a0ff;
+            font-style: italic;
+        }
+
+        #responseArea ul, #responseArea ol {
+            padding-left: 20px;
+            margin-left: 5px;
+        }
+        #responseArea li {
+            margin-bottom: 0.5em;
         }
 
         #responseArea pre {
-            background-color: #2a2a2a;
-            border: 1px solid #444;
-            border-left: 5px solid #00ffff;
-            padding: 10px 15px;
-            border-radius: 5px;
-            overflow-x: auto; /* Horizontal scroll for code blocks */
-            white-space: pre-wrap; /* Wrap long lines in pre */
+            background-color: var(--code-bg);
+            border: 1px solid var(--code-border);
+            border-left: 5px solid var(--primary-glow-darker);
+            padding: 15px 20px; /* More padding */
+            border-radius: 8px; /* Slightly more rounded */
+            overflow-x: auto;
+            white-space: pre-wrap;
             word-wrap: break-word;
             font-family: 'Consolas', 'Monaco', monospace;
             font-size: 0.9em;
-            margin: 15px 0;
+            line-height: 1.5;
+            margin: 1.5em 0;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5); /* Inner shadow for code blocks */
         }
+        #responseArea code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+        #responseArea pre code {
+            background-color: transparent; /* Don't double highlight in pre */
+            padding: 0;
+        }
+
+        /* Scrollbar Styling for Webkit Browsers (Chrome, Edge, Safari) */
+        #responseArea::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #responseArea::-webkit-scrollbar-track {
+            background: #282828;
+            border-radius: 10px;
+        }
+
+        #responseArea::-webkit-scrollbar-thumb {
+            background-color: var(--primary-glow);
+            border-radius: 10px;
+            border: 2px solid #282828;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+
+        #responseArea::-webkit-scrollbar-thumb:hover {
+            background-color: var(--primary-glow-darker);
+        }
+
+        /* Scrollbar Styling for Firefox */
+        #responseArea {
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-glow) #282828;
+        }
+
 
         /* Basic loading indicator style */
         .loading-dot {
             display: inline-block;
             width: 8px;
             height: 8px;
-            background-color: #00ffff;
+            background-color: var(--primary-glow);
             border-radius: 50%;
             margin: 0 2px;
             animation: bounce 1.4s infinite ease-in-out both;
+            box-shadow: 0 0 5px var(--primary-glow);
         }
         .loading-dot:nth-child(1) { animation-delay: -0.32s; }
         .loading-dot:nth-child(2) { animation-delay: -0.16s; }
@@ -150,7 +268,13 @@
 
         @keyframes bounce {
             0%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-8px); }
+            40% { transform: translateY(-10px); } /* Slightly higher bounce */
+        }
+
+        /* Error message style */
+        .error-message {
+            color: #ff6666; /* Redder tone for errors */
+            font-weight: 500;
         }
     </style>
 </head>
@@ -160,14 +284,14 @@
     <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.1.1/dist/index.min.js"></script>
 
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Ask Gemini something..." autofocus>
-        <button id="sendButton">❯</button> <!-- Using a unicode right arrow for the send button -->
+        <input type="text" id="searchInput" placeholder="Ask Gemini something..." autofocus autocomplete="off">
+        <button id="sendButton">❯</button>
     </div>
 
     <div id="responseArea">
-        <p>Your Gemini AI responses will appear here.</p>
-        <p>To begin, type a question in the search bar and press Enter or click the send button.</p>
-        <p>If you need to re-enter your API key, clear your browser's local storage or refresh the page and decline the previous key.</p>
+        <p>Your journey with Gemini AI begins here. Type a question above and press Enter or the glow button.</p>
+        <p>Your API Key will be securely stored in your browser's local storage for convenience.</p>
+        <p>If you encounter issues, try refreshing and re-entering your key, or check your browser's console (F12).</p>
     </div>
 
     <script>
@@ -182,15 +306,16 @@
 
         // Function to prompt for API Key
         function getApiKey() {
-            let key = prompt("Please enter your Google Gemini API Key. It will be stored in your browser's local storage.");
+            let key = prompt("Please enter your Google Gemini API Key. It will be stored securely in your browser's local storage.");
             if (key) {
                 localStorage.setItem(API_KEY_STORAGE_KEY, key);
                 geminiApiKey = key;
                 initializeGemini();
             } else {
-                responseArea.innerHTML = '<p style="color: red;">API Key is required to use Gemini AI. Please refresh the page to enter it.</p>';
+                responseArea.innerHTML = '<p class="error-message">API Key is required to use Gemini AI. Please refresh the page to enter it.</p>';
                 sendButton.disabled = true;
                 searchInput.disabled = true;
+                searchInput.placeholder = "API Key required...";
             }
         }
 
@@ -198,42 +323,77 @@
         function initializeGemini() {
             if (geminiApiKey) {
                 try {
+                    // Check if window.GoogleGenerativeAI is actually available
+                    if (typeof window.GoogleGenerativeAI !== 'function') {
+                        throw new Error("Google Generative AI SDK not loaded. Check your internet connection or browser extensions.");
+                    }
                     genAI = new window.GoogleGenerativeAI(geminiApiKey);
                     model = genAI.getGenerativeModel({ model: "gemini-pro" });
                     console.log("Gemini AI model initialized successfully.");
                     sendButton.disabled = false;
                     searchInput.disabled = false;
+                    searchInput.placeholder = "Ask Gemini something...";
                 } catch (error) {
                     console.error("Failed to initialize Gemini AI:", error);
-                    responseArea.innerHTML = `<p style="color: red;">Failed to initialize Gemini AI. Error: ${error.message}. Please check your API key and refresh.</p>`;
+                    responseArea.innerHTML = `<p class="error-message">Failed to initialize Gemini AI. Error: ${error.message}. Please ensure the SDK loaded correctly and your API key is valid.</p>`;
                     sendButton.disabled = true;
                     searchInput.disabled = true;
+                    searchInput.placeholder = "Initialization failed.";
                 }
             } else {
                 getApiKey(); // Prompt if key is not found
             }
         }
 
-        // Format Markdown response to HTML
+        // Improved Markdown to HTML formatter
         function formatMarkdown(markdownText) {
-            let html = markdownText
-                .replace(/^### (.*$)/gim, '<h3>$1</h3>') // H3
-                .replace(/^## (.*$)/gim, '<h2>$1</h2>')   // H2
-                .replace(/^# (.*$)/gim, '<h1>$1</h1>')    // H1
-                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>') // Bold
-                .replace(/\*(.*?)\*/gim, '<em>$1</em>')     // Italic
-                .replace(/```([\s\S]*?)```/gim, '<pre>$1</pre>') // Code blocks
-                .replace(/`([^`]+)`/gim, '<code>$1</code>') // Inline code
-                .replace(/\n/g, '<br>'); // Newlines
+            let html = markdownText;
 
-            // Simple list handling (can be more robust)
-            html = html.replace(/^\s*\*\s*(.*)/gim, '<li>$1</li>');
-            if (html.includes('<li>')) {
-                html = '<ul>' + html + '</ul>';
+            // Handle code blocks (must be first to prevent other regexes from messing with it)
+            html = html.replace(/```(\w*)\n([\s\S]*?)```/gm, (match, lang, code) => {
+                const languageClass = lang ? `class="language-${lang.toLowerCase()}"` : '';
+                return `<pre><code ${languageClass}>${code.trim()}</code></pre>`;
+            });
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>'); // Inline code
+
+            // Basic replacements for text formatting
+            html = html
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')   // H3
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')    // H2
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')     // H1
+                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>') // Bold
+                .replace(/\*(.*?)\*/gim, '<em>$1</em>')       // Italic (after bold to prevent double matches)
+                .replace(/^- (.*$)/gim, '<li>$1</li>')    // Unordered list items (simple)
+                .replace(/^\d+\. (.*$)/gim, '<li>$1</li>'); // Ordered list items (simple)
+
+            // Wrap list items in ul/ol if found, but avoid wrapping everything
+            // This is a simple wrapper and might not handle complex nested lists perfectly
+            if (html.includes('<li>') && !html.includes('<ul>') && !html.includes('<ol>')) {
+                // Determine list type based on first list item if mixed, default to ul
+                const isOrdered = html.match(/^<li>\d+\./m);
+                const listTag = isOrdered ? 'ol' : 'ul';
+                html = `<${listTag}>${html}</${listTag}>`;
             }
+
+            // Replace remaining newlines with <br> for paragraphs
+            html = html.replace(/\n/g, '<br>');
+
+            // Fix multiple <br> inside list items (a side effect of replacing all \n)
+            html = html.replace(/<li><br>/g, '<li>');
+            html = html.replace(/<br><\/li>/g, '</li>');
+
+            // Replace multiple <br> tags with just one, except after block elements
+            html = html.replace(/(<br>\s*){2,}/g, '<br><br>');
+
+
+            // Ensure paragraphs are wrapped (simplified, handles basic cases)
+            // This is tricky without a full parser, so we mostly rely on <br><br>
+            // A more robust solution would be to split by \n\n and wrap in <p>
+            // but that's harder with existing regexes. For now, rely on line breaks.
 
             return html;
         }
+
 
         // Send message to Gemini
         async function sendMessage() {
@@ -241,20 +401,24 @@
             if (!promptText) return;
 
             if (!geminiApiKey) {
-                responseArea.innerHTML = '<p style="color: red;">No Gemini API Key found. Please refresh the page to enter it.</p>';
+                responseArea.innerHTML = '<p class="error-message">No Gemini API Key found. Please refresh the page to enter it.</p>';
                 return;
             }
             if (!model) {
-                responseArea.innerHTML = '<p style="color: red;">Gemini model not initialized. Please refresh.</p>';
+                responseArea.innerHTML = '<p class="error-message">Gemini model not initialized. Please refresh.</p>';
                 return;
             }
 
             searchInput.value = ''; // Clear input
             sendButton.disabled = true;
             searchInput.disabled = true;
-            responseArea.classList.remove('visible'); // Hide old response
+            searchInput.placeholder = "Gemini is thinking...";
+
+            responseArea.classList.remove('visible'); // Hide old response instantly for a fresh animation
             responseArea.innerHTML = `<p>Thinking<span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></p>`;
-            responseArea.classList.add('visible'); // Show loading state
+            // Show loading state, then content animates in after fetch
+            responseArea.classList.add('visible');
+            responseArea.scrollTop = responseArea.scrollHeight; // Scroll to loading dots
 
             try {
                 const result = await model.generateContent(promptText);
@@ -264,20 +428,23 @@
             } catch (error) {
                 console.error("Error calling Gemini AI:", error);
                 let errorMessage = `Error: ${error.message}.`;
-                if (error.message.includes('API key not valid')) {
-                    errorMessage += " Your API key seems invalid. Please refresh the page to re-enter it.";
+                if (error.message.includes('API key not valid') || error.message.includes('API_KEY_INVALID')) {
+                    errorMessage = "Your API key seems invalid. Please refresh the page to re-enter it.";
                     localStorage.removeItem(API_KEY_STORAGE_KEY); // Remove invalid key
+                    geminiApiKey = null; // Clear in memory
                 } else if (error.message.includes('Quota exceeded')) {
-                    errorMessage += " You might have exceeded your Gemini API quota. Please check your Google Cloud Console.";
-                } else {
-                    errorMessage += " Please try again later.";
+                    errorMessage = "You might have exceeded your Gemini API quota. Please check your Google Cloud Console.";
+                } else if (error.message.includes('undefined is not a constructor')) {
+                    errorMessage = "Gemini SDK failed to load. Check internet, ad-blockers, or browser console.";
                 }
-                responseArea.innerHTML = `<p style="color: red;">${errorMessage}</p>`;
+                responseArea.innerHTML = `<p class="error-message">${errorMessage}</p>`;
             } finally {
                 sendButton.disabled = false;
                 searchInput.disabled = false;
                 searchInput.focus(); // Keep focus on search bar
+                searchInput.placeholder = "Ask Gemini something...";
                 responseArea.classList.add('visible'); // Ensure response is visible
+                responseArea.scrollTop = responseArea.scrollHeight; // Auto-scroll to bottom of response
             }
         }
 
@@ -291,11 +458,15 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
-            initializeGemini();
-            // Show initial message slightly after load
+            // Give a tiny delay before prompting for API key to ensure UI renders
+            setTimeout(() => {
+                initializeGemini();
+            }, 100);
+
+            // Show initial message slightly after load for a smooth entry
             setTimeout(() => {
                 responseArea.classList.add('visible');
-            }, 100);
+            }, 200); // Slightly delay to make it more noticeable
         });
     </script>
 </body>
